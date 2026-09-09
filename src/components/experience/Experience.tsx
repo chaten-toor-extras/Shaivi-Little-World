@@ -105,7 +105,7 @@ export default function Experience() {
         <div className="canvas-wrap">
           <WorldBoundary onError={() => setFlat(true)}>
             <Canvas
-              shadows={quality !== "LOW"}
+              shadows={quality === "LOW" ? false : "percentage"}
               dpr={quality === "LOW" ? 1 : quality === "MEDIUM" ? 1.3 : 1.75}
               camera={{ position: [13, 13, 22], fov: 42 }}
               gl={{ antialias: quality !== "LOW", powerPreference: "default" }}

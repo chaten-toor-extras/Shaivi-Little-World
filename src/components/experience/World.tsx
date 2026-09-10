@@ -15,11 +15,24 @@ import { Ball } from "../world/Shapes";
 import CameraRig from "./CameraRig";
 import { useExperienceStore } from "@/store/useExperienceStore";
 import { portfolio } from "@/data/portfolio";
-export default function World() {
+import WorldDetails from "../world/WorldDetails";
+export default function World({onReady}:{onReady:()=>void}) {
+  const firstFrame=useRef(false);
   const { mode, transitioning, quality, reducedMotion } = useExperienceStore();
   const butterfly = useRef<Group>(null);
+  const floating = useRef<Group>(null);
   const [clicks, setClicks] = useState(0);
   useFrame(({ clock }) => {
+    if(!firstFrame.current){firstFrame.current=true;onReady();}
+    if (floating.current) {
+      const alive = mode === "WORLD" && !reducedMotion;
+      floating.current.position.y = alive
+        ? Math.sin(clock.elapsedTime * 0.5) * 0.07
+        : 0;
+      floating.current.rotation.y = alive
+        ? Math.sin(clock.elapsedTime * 0.17) * 0.01
+        : 0;
+    }
     if (butterfly.current && !reducedMotion) {
       butterfly.current.position.x =
         -1.8 + Math.sin(clock.elapsedTime * 0.6) * 0.5;
@@ -45,48 +58,51 @@ export default function World() {
         shadow-camera-bottom={-8}
         shadow-normalBias={0.05}
       />
-      <Island />
-      <House />
-      <Desk />
-      <ArtWall />
-      <Telescope />
-      <Mailbox />
-      <RecordPlayer />
-      <group
-        ref={butterfly}
-        position={[-1.8, 1.8, 1]}
-        onClick={(e) => {
-          if (mode !== "WORLD" || transitioning) return;
-          e.stopPropagation();
-          setClicks((c) => c + 1);
-        }}
-      >
-        <Ball scale={[0.13, 0.04, 0.08]} color="#f9d092" />
-        <Ball
-          position={[0.15, 0.05, 0]}
-          scale={[0.12, 0.03, 0.08]}
-          color="#f9d092"
-        />
-        {clicks >= 3 && mode === "WORLD" && (
-          <Html center position={[0, 0.5, 0]}>
-            <div className="secret">
-              <button
-                aria-label="Close secret"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setClicks(0);
-                }}
-              >
-                ×
-              </button>
-              <strong>A tiny secret, found.</strong>
-              <p>Things you probably didn’t need to know about Shaivi</p>
-              {portfolio.secret.map((f) => (
-                <p key={f}>{f}</p>
-              ))}
-            </div>
-          </Html>
-        )}
+      <group ref={floating}>
+        <Island />
+        <House />
+        <Desk />
+        <ArtWall />
+        <Telescope />
+        <Mailbox />
+        <RecordPlayer />
+        <WorldDetails />
+        <group
+          ref={butterfly}
+          position={[-1.8, 1.8, 1]}
+          onClick={(e) => {
+            if (mode !== "WORLD" || transitioning) return;
+            e.stopPropagation();
+            setClicks((c) => c + 1);
+          }}
+        >
+          <Ball scale={[0.13, 0.04, 0.08]} color="#f9d092" />
+          <Ball
+            position={[0.15, 0.05, 0]}
+            scale={[0.12, 0.03, 0.08]}
+            color="#f9d092"
+          />
+          {clicks >= 3 && mode === "WORLD" && (
+            <Html center position={[0, 0.5, 0]}>
+              <div className="secret">
+                <button
+                  aria-label="Close secret"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setClicks(0);
+                  }}
+                >
+                  ×
+                </button>
+                <strong>A tiny secret, found.</strong>
+                <p>Things you probably didn’t need to know about Shaivi</p>
+                {portfolio.secret.map((f) => (
+                  <p key={f}>{f}</p>
+                ))}
+              </div>
+            </Html>
+          )}
+        </group>
       </group>
       <CameraRig />
       {mode === "WORLD" && !transitioning && (

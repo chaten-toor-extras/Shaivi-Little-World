@@ -9,11 +9,11 @@ export const anchors: Record<
   [number, number, number]
 > = {
   ABOUT: [0, 1.1, -0.9],
-  PROJECTS: [1.4, 1.52, 2.18],
+  QUOTES: [1.4, 1.52, 2.18],
   GALLERY: [-2.8, 1.05, -0.3],
   JOURNEY: [1.65, 1.8, -2.5],
   CONTACT: [-0.5, 0.8, 3.1],
-  INTERESTS: [3, 0.8, 0.3],
+  MUSIC: [3, 0.8, 0.3],
 };
 export default function CameraRig() {
   const { camera, size } = useThree();
@@ -40,17 +40,17 @@ export default function CameraRig() {
       ? new Vector3(
           ...(mobile ? ([10, 12, 18] as const) : ([10, 10, 16] as const)),
         )
-      : mode === "PROJECTS"
+      : mode === "QUOTES"
         ? new Vector3(1.4, 1.52, 2.18 + screenDistance)
         : destination.clone().add(new Vector3(2.5, 2.1, 5.6));
     const start = cam.position.clone();
     const fromTarget = target.current.clone();
     const startFov = cam.fov;
-    const endFov = world ? (mobile ? 45 : 38) : mode === "PROJECTS" ? 37 : 42;
+    const endFov = world ? (mobile ? 45 : 38) : mode === "QUOTES" ? 37 : 42;
     const progress = { value: 0 };
     const tween = gsap.to(progress, {
       value: 1,
-      duration: reduced ? 0.01 : mode === "INTRO" ? 1.5 : 1.25,
+      duration: reduced ? 0 : mode === "INTRO" ? 1.5 : 1.25,
       ease: "power2.inOut",
       onUpdate: () => {
         cam.position.lerpVectors(start, end, progress.value);
@@ -67,7 +67,10 @@ export default function CameraRig() {
         else useExperienceStore.getState().settle();
       },
     });
+    // Background tabs may throttle animation frames; never leave navigation locked.
+    const deadline=setTimeout(()=>{if(tween.progress()<1)tween.progress(1);},mode==='INTRO'?1900:1650);
     return () => {
+      clearTimeout(deadline);
       tween.kill();
     };
   }, [camera, mode, reduced, size.width, size.height]);

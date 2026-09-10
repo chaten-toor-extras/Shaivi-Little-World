@@ -1,8 +1,8 @@
 # Shaivi’s Little World
 
-An explorable, procedural 3D portfolio built with Next.js, React, Three.js / React Three Fiber, Drei, GSAP and Zustand. No model files, backend, or API keys are required.
+A procedural 3D island with six immersive experiences, built with Next.js, React Three Fiber, Drei, GSAP and Zustand. Static export; no backend or API keys.
 
-## Run
+## Run and check
 
 ```sh
 npm install
@@ -12,18 +12,25 @@ npm run lint
 npm run build
 ```
 
-The production website is exported to `out/` for static hosting. Serve `out/` with any static HTTP server.
+Production files are exported to `out/`.
 
-## Personalize
+## Experiences
 
-Edit `src/data/portfolio.ts` for all biography, projects, gallery, journey, interests, contact and secret content. The initial content is explicitly illustrative and does not claim real achievements. An empty contact email deliberately leaves the email action inactive. Set an actual email to activate mailto and copy actions. Add social URLs in the same file.
+- Art: 12 draggable, stacking prints, keyboard-accessible index, full-screen viewer, arrow and swipe navigation. Print positions survive closing the viewer.
+- Quotes: analog television, original demo quotes, channel controls and power switch.
+- Contact: validated letter form with a folding animation. Demo only: nothing is sent or saved.
+- Music: seven imaginary tracks, six moods, progress and volume controls. Visual playback only; no music is streamed.
+- Artist: editorial biography with a clearly labeled stock portrait.
+- Journey: selectable constellation milestones.
 
-World objects live in `src/components/world`. Camera poses and transition behavior live in `src/components/experience/CameraRig.tsx`. The monitor uses a spatial DOM surface; other destination content is framed in a responsive paper panel. The desktop can be replaced by a model while keeping its interaction wrapper and HTML screen.
+Escape returns to the island; inside an artwork it first returns to the desk. Dialogs manage focus and background scroll. The simple portfolio works without WebGL. Reduced motion follows the OS and can be toggled. Island ambience is opt-in and separate from the visual music player.
 
-## Controls and accessibility
+## Replace demo content
 
-Tap objects or their labels, or use Explore for keyboard navigation. Drag gently to orbit. Escape and Back return to the island. The gallery supports swipe and arrow keys. Sound is opt-in and generated with Web Audio. Detail controls cap DPR and shadow quality. Reduced motion follows the OS preference and can be toggled in the UI. The simple version exposes all content without WebGL; initialization failures and context loss also lead to HTML content.
+Edit `src/data/artist.ts`, `artworks.ts`, `quotes.ts`, `songs.ts`, `timeline.ts`, and `contact.ts`. Reference photographs and credits live in `images.json`; the stock portrait is in `artist.ts`. Replace these with authorized artwork and a real portrait before presenting them as Shaivi’s work. `portfolio.ts` contains navigation labels and the butterfly secret.
+
+World geometry lives in `src/components/world`; camera poses and travel live in `src/components/experience/CameraRig.tsx`. Individual section components live in `src/components/ui`. `src/app/immersive.css` contains the themed, responsive experiences.
 
 ## Performance
 
-Low-poly procedural geometry, instanced flowers, one shadow-casting light, bounded DPR, mobile defaults and no post-processing. Frame rate on physical mobile devices still needs profiling before a public launch. Google Fonts are optional and fall back to local system fonts.
+Bounded DPR, selectable quality, instanced flowers, lightweight procedural geometry, and one shadow-casting light. Drag updates use refs and CSS translation without React renders per pointer move. Physical-device frame-rate profiling remains recommended before a public launch.

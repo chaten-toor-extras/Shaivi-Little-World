@@ -33,8 +33,29 @@ function Tree({
   position: [number, number, number];
   scale?: number;
 }) {
+  const tree = useRef<THREE.Group>(null),
+    shake = useRef(0);
+  const reduced = useExperienceStore((s) => s.reducedMotion);
+  useFrame(({ clock }, dt) => {
+    if (tree.current)
+      tree.current.rotation.z = reduced
+        ? 0
+        : Math.sin(clock.elapsedTime * 0.8 + position[0]) * 0.012 +
+          Math.sin(clock.elapsedTime * 18) * shake.current;
+    shake.current = Math.max(0, shake.current - dt * 0.1);
+  });
   return (
-    <group position={position} scale={scale}>
+    <group
+      ref={tree}
+      position={position}
+      scale={scale}
+      onClick={(e) => {
+        if (useExperienceStore.getState().mode === "WORLD") {
+          e.stopPropagation();
+          shake.current = 0.1;
+        }
+      }}
+    >
       <Cylinder
         position={[0, 0.65, 0]}
         scale={[0.1, 1.3, 0.1]}
@@ -99,13 +120,13 @@ export default function Island() {
   return (
     <group>
       <Terrain />
-      <mesh position={[0, -0.02, 0]} rotation={[0, 0.1, 0]} receiveShadow>
+      <mesh position={[0, -0.02, 0]} scale={[1, 1, 0.78]} receiveShadow>
         <cylinderGeometry args={[5.55, 5.45, 0.22, 11]} />
         <meshStandardMaterial color="#bbc79c" roughness={1} />
       </mesh>
       <group scale={[1, 1, 0.78]}>
         <mesh
-          position={[0, -0.01, 0]}
+          position={[0, 0.095, 0]}
           receiveShadow
           rotation={[-Math.PI / 2, 0, 0]}
         >
@@ -123,6 +144,8 @@ export default function Island() {
       ))}
       <Tree position={[-3.5, 0.12, -1.8]} scale={1.1} />
       <Tree position={[-2.1, 0.12, -3]} scale={0.8} />
+      <Tree position={[-2.8, 0.12, -2.5]} scale={0.55} />
+      <Tree position={[3.5, 0.12, -1.9]} scale={0.65} />
       <Tree position={[2.9, 0.12, -2.2]} scale={1.25} />
       <Tree position={[4, 0.12, 0.6]} scale={0.72} />
       <Tree position={[-4, 0.12, 0.5]} scale={0.65} />

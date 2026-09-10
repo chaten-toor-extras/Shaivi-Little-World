@@ -1,19 +1,19 @@
 export const sections = [
   "ABOUT",
-  "PROJECTS",
+  "QUOTES",
   "GALLERY",
   "JOURNEY",
   "CONTACT",
-  "INTERESTS",
+  "MUSIC",
 ] as const;
 export type Section = (typeof sections)[number];
 export const labels: Record<Section, string> = {
-  ABOUT: "The studio",
-  PROJECTS: "Selected projects",
-  GALLERY: "The art corner",
-  JOURNEY: "My constellation",
-  CONTACT: "Leave a little note",
-  INTERESTS: "Off the clock",
+  ABOUT: "Artist",
+  QUOTES: "Read quotes",
+  GALLERY: "Open art",
+  JOURNEY: "Look through",
+  CONTACT: "Post a letter",
+  MUSIC: "Play music",
 };
 export const portfolio = {
   person: {

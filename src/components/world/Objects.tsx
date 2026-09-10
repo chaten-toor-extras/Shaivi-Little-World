@@ -1,11 +1,11 @@
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import { Group, Mesh } from "three";
+import { Group } from "three";
+import HouseDetails from "./HouseDetails";
 import { Box, Ball, Cylinder } from "./Shapes";
 import { useExperienceStore } from "@/store/useExperienceStore";
 import { labels, type Section } from "@/data/portfolio";
-import { ProjectsContent } from "@/components/ui/Content";
 function ObjectLink({
   section,
   position,
@@ -57,7 +57,7 @@ function ObjectLink({
             }}
           >
             <span>
-              {section === "PROJECTS"
+              {section === "QUOTES"
                 ? "✳"
                 : section === "ABOUT"
                   ? "⌂"
@@ -87,6 +87,7 @@ export function House() {
   });
   return (
     <ObjectLink section="ABOUT" position={[0, 0.15, -1.1]} labelHeight={3.2}>
+      <HouseDetails />
       <Box position={[0, 1, 0]} scale={[2.1, 1.9, 1.65]} color="#e9cfaa" />
       <mesh position={[0, 2.35, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
         <coneGeometry args={[1.85, 1.15, 4]} />
@@ -119,14 +120,9 @@ export function House() {
   );
 }
 export function Desk() {
-  const mode = useExperienceStore((s) => s.mode),
-    busy = useExperienceStore((s) => s.transitioning);
+  const mode = useExperienceStore((s) => s.mode);
   return (
-    <ObjectLink
-      section="PROJECTS"
-      position={[1.4, 0.12, 2.1]}
-      labelHeight={2.1}
-    >
+    <ObjectLink section="QUOTES" position={[1.4, 0.12, 2.1]} labelHeight={2.1}>
       <Box position={[0, 0.78, 0]} scale={[1.8, 0.13, 0.8]} color="#b89372" />
       {[-0.75, 0.75].flatMap((x) =>
         [-0.28, 0.28].map((z) => (
@@ -140,9 +136,29 @@ export function Desk() {
       )}
       <Box position={[0, 1.4, 0]} scale={[1.25, 0.83, 0.1]} color="#4a5555" />
       <Box
+        position={[0.73, 1.4, 0]}
+        scale={[0.24, 0.83, 0.18]}
+        color="#ac8867"
+      />
+      {[1.25, 1.55].map((y) => (
+        <Cylinder
+          key={y}
+          position={[0.74, y, 0.12]}
+          rotation={[Math.PI / 2, 0, 0]}
+          scale={[0.07, 0.05, 0.07]}
+          color="#d9c5a6"
+        />
+      ))}
+      <Cylinder
+        position={[-0.3, 1.97, 0]}
+        rotation={[0, 0, 0.4]}
+        scale={[0.012, 0.45, 0.012]}
+        color="#777364"
+      />
+      <Box
         position={[0, 1.4, 0.061]}
         scale={[1.13, 0.7, 0.025]}
-        color={mode === "PROJECTS" ? "#efe9df" : "#a7b8b3"}
+        color={mode === "QUOTES" ? "#efe9df" : "#a7b8b3"}
       />
       <Box position={[0, 0.97, 0]} scale={[0.1, 0.3, 0.1]} color="#5b615b" />
       <Box
@@ -170,18 +186,6 @@ export function Desk() {
         scale={[0.24, 0.2, 0.16]}
         color="#bca175"
       />
-      {mode === "PROJECTS" && !busy && (
-        <Html
-          transform
-          position={[0, 1.4, 0.084]}
-          distanceFactor={1}
-          zIndexRange={[60, 50]}
-        >
-          <div id="monitor-content" className="monitor-interface">
-            <ProjectsContent />
-          </div>
-        </Html>
-      )}
     </ObjectLink>
   );
 }
@@ -304,15 +308,15 @@ export function Mailbox() {
   );
 }
 export function RecordPlayer() {
-  const disk = useRef<Mesh>(null);
+  const hand = useRef<Group>(null);
   const mode = useExperienceStore((s) => s.mode),
     reduced = useExperienceStore((s) => s.reducedMotion);
   useFrame((_, dt) => {
-    if (disk.current && mode === "INTERESTS" && !reduced)
-      disk.current.rotation.y += dt * 1.5;
+    if (hand.current && mode === "MUSIC" && !reduced)
+      hand.current.rotation.z -= dt * 0.8;
   });
   return (
-    <ObjectLink section="INTERESTS" position={[3, 0.12, 0.3]} labelHeight={1.7}>
+    <ObjectLink section="MUSIC" position={[3, 0.12, 0.3]} labelHeight={1.7}>
       <Box position={[0, 0.46, 0]} scale={[1, 0.09, 0.7]} color="#9f8065" />
       {[-0.4, 0.4].map((x) => (
         <Box
@@ -322,23 +326,52 @@ export function RecordPlayer() {
           color="#81644e"
         />
       ))}
-      <Box position={[0, 0.62, 0]} scale={[0.86, 0.2, 0.58]} color="#b48263" />
       <Cylinder
-        ref={undefined}
-        position={[-0.12, 0.73, 0]}
-        scale={[0.24, 0.025, 0.24]}
-        color="#414944"
+        position={[0, 1.02, 0]}
+        rotation={[Math.PI / 2, 0, 0]}
+        scale={[0.5, 0.19, 0.5]}
+        color="#ac876a"
       />
-      <mesh ref={disk} position={[-0.12, 0.75, 0]}>
-        <cylinderGeometry args={[0.09, 0.09, 0.02, 20]} />
-        <meshStandardMaterial color="#e1b57d" />
-      </mesh>
+      <Cylinder
+        position={[0, 1.02, 0.11]}
+        rotation={[Math.PI / 2, 0, 0]}
+        scale={[0.44, 0.025, 0.44]}
+        color="#f0ddb6"
+      />
+      {Array.from({ length: 12 }, (_, i) => (
+        <Ball
+          key={i}
+          position={[
+            Math.sin((i * Math.PI) / 6) * 0.35,
+            1.02 + Math.cos((i * Math.PI) / 6) * 0.35,
+            0.14,
+          ]}
+          scale={0.024}
+          color="#7e735d"
+        />
+      ))}
+      <group ref={hand} position={[0, 1.02, 0.15]}>
+        <Box
+          position={[0, 0.12, 0]}
+          scale={[0.025, 0.26, 0.02]}
+          color="#596555"
+        />
+      </group>
       <Box
-        position={[0.24, 0.77, 0]}
-        rotation={[0, 0.3, 0]}
-        scale={[0.035, 0.025, 0.4]}
-        color="#e2cfb1"
+        position={[-0.09, 1.05, 0.16]}
+        rotation={[0, 0, 1.1]}
+        scale={[0.025, 0.22, 0.02]}
+        color="#596555"
       />
+      <Ball position={[0, 1.02, 0.18]} scale={0.04} color="#aa7958" />
+      {[-0.32, 0.32].map((x) => (
+        <Ball
+          key={x}
+          position={[x, 1.49, 0]}
+          scale={[0.2, 0.08, 0.12]}
+          color="#aa7958"
+        />
+      ))}
     </ObjectLink>
   );
 }

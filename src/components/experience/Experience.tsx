@@ -44,6 +44,8 @@ export default function Experience() {
     skip,
   } = useExperienceStore();
   const [flat, setFlat] = useState(false);
+  const [sceneReady,setSceneReady]=useState(false);
+  useEffect(()=>{if(flat||sceneReady)return;const timeout=setTimeout(()=>setFlat(true),12000);return()=>clearTimeout(timeout);},[flat,sceneReady]);
   const [menu, setMenu] = useState(false);
   useAudio(audio);
   useEffect(() => {
@@ -126,7 +128,7 @@ export default function Experience() {
               }}
             >
               <Suspense fallback={null}>
-                <World />
+                <World onReady={()=>setSceneReady(true)}/>
               </Suspense>
             </Canvas>
           </WorldBoundary>
@@ -178,7 +180,7 @@ export default function Experience() {
           </button>
         </nav>
       )}
-      <SectionOverlay flat={flat} />
+      <SectionOverlay />
       <footer>
         <div className="world-instruction">
           <span className="compass">✥</span>

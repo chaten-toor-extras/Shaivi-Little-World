@@ -23,8 +23,9 @@ export const login = asyncHandler(async (req, res) => {
     sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/',
   });
+  res.setHeader('X-CSRF-Token', csrfToken);
 
-  return success(res, { data: { admin } });
+  return success(res, { data: { admin, csrfToken } });
 });
 
 export const refresh = asyncHandler(async (req, res) => {
@@ -38,7 +39,19 @@ export const refresh = asyncHandler(async (req, res) => {
   tokenService.setAccessCookie(res, accessToken);
   tokenService.setRefreshCookie(res, refreshToken);
 
-  return success(res, { message: 'Token refreshed' });
+  let csrfToken = req.cookies['csrf_token'];
+  if (!csrfToken) {
+    csrfToken = uuidv4();
+    res.cookie('csrf_token', csrfToken, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/',
+    });
+  }
+  res.setHeader('X-CSRF-Token', csrfToken);
+
+  return success(res, { message: 'Token refreshed', data: { csrfToken } });
 });
 
 export const logout = asyncHandler(async (req, res) => {
@@ -52,16 +65,19 @@ export const logout = asyncHandler(async (req, res) => {
 export const getMe = asyncHandler(async (req, res) => {
   const admin = await authService.getProfile(req.admin._id);
 
-  if (!req.cookies['csrf_token']) {
-    res.cookie('csrf_token', uuidv4(), {
+  let csrfToken = req.cookies['csrf_token'];
+  if (!csrfToken) {
+    csrfToken = uuidv4();
+    res.cookie('csrf_token', csrfToken, {
       httpOnly: false,
       secure: env.NODE_ENV === 'production',
       sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
     });
   }
+  res.setHeader('X-CSRF-Token', csrfToken);
 
-  return success(res, { data: { admin } });
+  return success(res, { data: { admin, csrfToken } });
 });
 
 export const changePassword = asyncHandler(async (req, res) => {

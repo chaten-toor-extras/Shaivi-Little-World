@@ -1,5 +1,5 @@
 import type { Admin, ApiResponse } from "@/types";
-import { apiGet, apiPost } from "./api";
+import { apiGet, apiPost, setCsrfToken } from "./api";
 
 export interface LoginCredentials {
   email: string;
@@ -20,6 +20,7 @@ export const authService = {
   },
 
   logout: async (): Promise<ApiResponse<null>> => {
+    setCsrfToken(undefined);
     return apiPost<null>("/auth/logout");
   },
 

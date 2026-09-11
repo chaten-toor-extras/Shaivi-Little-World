@@ -1,7 +1,9 @@
 import { env } from './env.js';
 
+const envUrls = env.CLIENT_URL ? env.CLIENT_URL.split(',').map((u) => u.trim()) : [];
+
 const allowedOrigins = [
-  env.CLIENT_URL,
+  ...envUrls,
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'http://localhost:5000',
@@ -23,5 +25,5 @@ export const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
-  exposedHeaders: ['Set-Cookie'],
+  exposedHeaders: ['Set-Cookie', 'X-CSRF-Token'],
 };

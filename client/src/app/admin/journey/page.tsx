@@ -380,7 +380,7 @@ export default function AdminJourneyPage() {
         rowKey="_id"
         loading={isLoading}
         pagination={false}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: "max-content" }}
       />
 
       <Modal
@@ -431,18 +431,25 @@ export default function AdminJourneyPage() {
             />
           </Form.Item>
 
-          <Form.Item label="Constellation Star Placement">
-            <TelescopeStarEditor
-              value={starCoord}
-              onChange={(coord) => {
-                setStarCoord(coord);
-                form.setFieldsValue({ posX: coord.x, posY: coord.y });
-              }}
-              otherMilestones={milestones}
-              currentId={editingMilestone?._id}
-              currentYear={form.getFieldValue("year") || "Star"}
-              onAutoArrange={handleAutoArrangeAll}
-            />
+          <Form.Item
+            noStyle
+            shouldUpdate={(prev, cur) => prev?.year !== cur?.year}
+          >
+            {({ getFieldValue }) => (
+              <Form.Item label="Constellation Star Placement">
+                <TelescopeStarEditor
+                  value={starCoord}
+                  onChange={(coord) => {
+                    setStarCoord(coord);
+                    form.setFieldsValue({ posX: coord.x, posY: coord.y });
+                  }}
+                  otherMilestones={milestones}
+                  currentId={editingMilestone?._id}
+                  currentYear={getFieldValue("year") || "Star"}
+                  onAutoArrange={handleAutoArrangeAll}
+                />
+              </Form.Item>
+            )}
           </Form.Item>
 
           <Form.Item name="posX" noStyle>

@@ -1,4 +1,4 @@
-import { Button, Modal, Segmented, Slider, Space } from "antd";
+import { Button, Modal, Segmented, Slider } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
 
@@ -18,82 +18,127 @@ const PRESET_OPTIONS = [
   { label: "16:9", value: "16:9" },
 ];
 
+async function createSafeImage(
+  url: string,
+): Promise<{ image: HTMLImageElement; cleanup: () => void }> {
+  let objectUrl: string | null = null;
+  let finalUrl = url;
+
+  // If external URL (http/https), fetch as blob first so canvas is NEVER tainted
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    try {
+      const res = await fetch(url, { mode: "cors" });
+      if (res.ok) {
+        const blob = await res.blob();
+        objectUrl = URL.createObjectURL(blob);
+        finalUrl = objectUrl;
+      }
+    } catch {
+      // Fallback to crossOrigin below
+    }
+  }
+
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = (e) => reject(e);
+    if (
+      !objectUrl &&
+      (url.startsWith("http://") || url.startsWith("https://"))
+    ) {
+      const sep = url.includes("?") ? "&" : "?";
+      img.src = `${url}${sep}t=${Date.now()}`;
+    } else {
+      img.src = finalUrl;
+    }
+  });
+
+  return {
+    image,
+    cleanup: () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    },
+  };
+}
+
 async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
   rotation: number = 0,
 ): Promise<File> {
-  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = (e) => reject(e);
-    img.src = imageSrc;
-  });
+  const { image, cleanup } = await createSafeImage(imageSrc);
 
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  try {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
-  if (!ctx) {
-    throw new Error("No 2d context");
-  }
+    if (!ctx) {
+      throw new Error("No 2d context");
+    }
 
-  // Calculate bounding box of the rotated image
-  const rotRad = (rotation * Math.PI) / 180;
-  const boundingBoxWidth =
-    Math.abs(Math.cos(rotRad) * image.width) +
-    Math.abs(Math.sin(rotRad) * image.height);
-  const boundingBoxHeight =
-    Math.abs(Math.sin(rotRad) * image.width) +
-    Math.abs(Math.cos(rotRad) * image.height);
+    // Calculate bounding box of the rotated image
+    const rotRad = (rotation * Math.PI) / 180;
+    const boundingBoxWidth =
+      Math.abs(Math.cos(rotRad) * image.width) +
+      Math.abs(Math.sin(rotRad) * image.height);
+    const boundingBoxHeight =
+      Math.abs(Math.sin(rotRad) * image.width) +
+      Math.abs(Math.cos(rotRad) * image.height);
 
-  canvas.width = boundingBoxWidth;
-  canvas.height = boundingBoxHeight;
+    canvas.width = boundingBoxWidth;
+    canvas.height = boundingBoxHeight;
 
-  // Translate to center and rotate
-  ctx.translate(canvas.width / 2, canvas.height / 2);
-  ctx.rotate(rotRad);
-  ctx.translate(-image.width / 2, -image.height / 2);
+    // Translate to center and rotate
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(rotRad);
+    ctx.translate(-image.width / 2, -image.height / 2);
 
-  // Draw image
-  ctx.drawImage(image, 0, 0);
+    // Draw image
+    ctx.drawImage(image, 0, 0);
 
-  // Extract the cropped image
-  const croppedCanvas = document.createElement("canvas");
-  const croppedCtx = croppedCanvas.getContext("2d");
+    // Extract the cropped image
+    const croppedCanvas = document.createElement("canvas");
+    const croppedCtx = croppedCanvas.getContext("2d");
 
-  if (!croppedCtx) {
-    throw new Error("No 2d context for cropped canvas");
-  }
+    if (!croppedCtx) {
+      throw new Error("No 2d context for cropped canvas");
+    }
 
-  croppedCanvas.width = pixelCrop.width;
-  croppedCanvas.height = pixelCrop.height;
+    croppedCanvas.width = pixelCrop.width;
+    croppedCanvas.height = pixelCrop.height;
 
-  croppedCtx.drawImage(
-    canvas,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
-    0,
-    0,
-    pixelCrop.width,
-    pixelCrop.height,
-  );
-
-  return new Promise((resolve, reject) => {
-    croppedCanvas.toBlob(
-      (blob) => {
-        if (!blob) {
-          reject(new Error("Canvas is empty"));
-          return;
-        }
-        const file = new File([blob], "cropped.jpg", { type: "image/jpeg" });
-        resolve(file);
-      },
-      "image/jpeg",
-      0.9,
+    croppedCtx.drawImage(
+      canvas,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      pixelCrop.width,
+      pixelCrop.height,
     );
-  });
+
+    return await new Promise<File>((resolve, reject) => {
+      croppedCanvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("Canvas is empty"));
+            return;
+          }
+          const file = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+          resolve(file);
+        },
+        "image/jpeg",
+        0.92,
+      );
+    });
+  } finally {
+    cleanup();
+  }
 }
 
 export default function ImageCropModal({
@@ -213,6 +258,7 @@ export default function ImageCropModal({
         >
           <Cropper
             image={imageUrl}
+            mediaProps={{ crossOrigin: "anonymous" }}
             crop={crop}
             zoom={zoom}
             rotation={rotation}
@@ -236,7 +282,14 @@ export default function ImageCropModal({
           />
         </div>
 
-        <Space direction="vertical" style={{ width: "100%" }}>
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+          }}
+        >
           <div>
             <div style={{ fontSize: "0.9rem" }}>Zoom</div>
             <Slider
@@ -265,7 +318,7 @@ export default function ImageCropModal({
               }}
             />
           </div>
-        </Space>
+        </div>
       </div>
     </Modal>
   );

@@ -990,7 +990,7 @@ export default function AdminWorldPage() {
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
-            message="Dynamic Day & Night Atmosphere Notice"
+            title="Dynamic Day & Night Atmosphere Notice"
             description="When Dynamic Day & Night is active (configured in the Day & Night tab), the active time profile sets sky color and fog. Disabling Day & Night or customizing profiles in the Day & Night tab will apply your changes directly."
           />
           <Row gutter={[24, 16]}>
@@ -1058,7 +1058,7 @@ export default function AdminWorldPage() {
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
-            message="Dynamic Day & Night Light Override Notice"
+            title="Dynamic Day & Night Light Override Notice"
             description="When Day & Night is active, hemisphere and sun colors/intensities are driven by the active time profile. Shadow casting and shadow level configured below always apply to the 3D scene."
           />
           <Row gutter={[24, 16]}>
@@ -1122,7 +1122,14 @@ export default function AdminWorldPage() {
                   <Slider min={0} max={8} step={0.1} />
                 </Form.Item>
                 <Form.Item label="Sun Beam Position (X, Y, Z)">
-                  <Space style={{ width: "100%" }} direction="vertical">
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 0,
+                    }}
+                  >
                     <Form.Item
                       name={["lighting", "directional", "position", "x"]}
                       label="X (Horizontal)"
@@ -1144,7 +1151,7 @@ export default function AdminWorldPage() {
                     >
                       <Slider min={-20} max={20} step={1} />
                     </Form.Item>
-                  </Space>
+                  </div>
                 </Form.Item>
                 <Form.Item
                   label="Cast Shadows"

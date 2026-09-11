@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "seed": "node src/scripts/seedAdmin.js && node src/scripts/seedContent.js && node src/scripts/seedWorld.js && node src/scripts/seedJourney.js",
     "seed:admin": "node src/scripts/seedAdmin.js",
     "seed:content": "node src/scripts/seedContent.js",
     "seed:world": "node src/scripts/seedWorld.js",
+    "seed:journey": "node src/scripts/seedJourney.js",
     "test": "vitest run"
   },
   "dependencies": {

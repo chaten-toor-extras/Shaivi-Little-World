@@ -1,0 +1,35 @@
+{
+  "name": "shaivis-little-world-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "seed:admin": "node src/scripts/seedAdmin.js",
+    "seed:content": "node src/scripts/seedContent.js",
+    "seed:world": "node src/scripts/seedWorld.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.14.1",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "helmet": "^8.1.0",
+    "express-rate-limit": "^7.5.0",
+    "zod": "^3.24.4",
+    "cloudinary": "^2.6.1",
+    "multer": "^1.4.5-lts.2",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0",
+    "dotenv": "^16.5.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.1",
+    "supertest": "^7.1.0"
+  }
+}

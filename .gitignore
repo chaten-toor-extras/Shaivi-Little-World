@@ -1,6 +1,34 @@
+# Dependencies
 node_modules/
+
+# Next.js
 .next/
 out/
+
+# Build
 *.tsbuildinfo
-.env*
+
+# Environment
+.env
+.env.local
+.env.*.local
 !.env.example
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary uploads
+uploads/
+tmp/

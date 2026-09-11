@@ -1,0 +1,670 @@
+/* Scoped Journey Star Card (Milestone Detail) Styles */
+
+.cardContainer {
+  position: absolute;
+  right: clamp(16px, 3.5vw, 36px);
+  bottom: clamp(60px, 8vh, 80px);
+  width: clamp(300px, 32vw, 390px);
+  max-height: calc(78vh - 80px);
+  background: rgba(16, 13, 29, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(210, 195, 248, 0.3);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(3, 2, 8, 0.55);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: cardFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid rgba(200, 185, 240, 0.12);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.yearTag {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #dfd1fa;
+  background: rgba(180, 160, 235, 0.18);
+  border: 1px solid rgba(200, 182, 245, 0.35);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.counterBadge {
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: rgba(220, 205, 250, 0.7);
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.minimizeBtn,
+.closeCardBtn {
+  background: transparent;
+  border: none;
+  color: rgba(220, 205, 250, 0.65);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition:
+    color 0.18s,
+    background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.minimizeBtn {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.minimizeBtn:hover,
+.closeCardBtn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.minimizeBtn:focus-visible,
+.closeCardBtn:focus-visible {
+  outline: 2px solid #dfd1fa;
+}
+
+.cardBody {
+  padding: 14px 16px 14px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(180, 160, 230, 0.3) transparent;
+}
+
+.cardBody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cardBody::-webkit-scrollbar-thumb {
+  background: rgba(180, 160, 230, 0.3);
+  border-radius: 4px;
+}
+
+.cardImageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: rgba(25, 20, 42, 0.7);
+  border: 1px solid rgba(200, 185, 240, 0.22);
+  cursor: pointer;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.cardImageWrapper:hover,
+.cardImageWrapper:focus-visible {
+  border-color: rgba(225, 210, 255, 0.65);
+  box-shadow: 0 0 16px rgba(198, 175, 255, 0.35);
+  transform: scale(1.01);
+}
+
+.cardImageWrapper :global(.art-photo) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cardImageWrapper img {
+  object-fit: cover !important;
+  transition: transform 0.35s ease;
+}
+
+.cardImageWrapper:hover img {
+  transform: scale(1.05);
+}
+
+.imageExpandBadge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(12, 10, 24, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(220, 205, 250, 0.35);
+  border-radius: 16px;
+  padding: 3px 8px;
+  font-family: monospace;
+  font-size: 10.5px;
+  color: #ede5f8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.cardImageWrapper:hover .imageExpandBadge {
+  background: rgba(45, 36, 75, 0.9);
+  border-color: rgba(230, 215, 255, 0.7);
+  color: #ffffff;
+}
+
+.expandIcon {
+  font-size: 11px;
+}
+
+.cardTitle {
+  font-family: Georgia, serif;
+  font-size: 19px;
+  font-weight: 400;
+  color: #faf7ff;
+  margin: 0 0 8px 0;
+  line-height: 1.25;
+}
+
+.cardText {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d8cde8;
+  margin: 0 0 10px 0;
+}
+
+.cardCaption {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 11.5px;
+  color: rgba(200, 185, 235, 0.65);
+  margin: 0;
+}
+
+/* Card footer with prominent navigation buttons */
+.cardFooterNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 12px;
+  border-top: 1px solid rgba(200, 185, 240, 0.12);
+  background: rgba(12, 10, 22, 0.5);
+}
+
+.cardNavBtn {
+  flex: 1;
+  background: rgba(45, 37, 72, 0.75);
+  border: 1px solid rgba(210, 195, 250, 0.32);
+  color: #f1ecfa;
+  font-family: monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.18s,
+    border-color 0.18s,
+    transform 0.12s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardNavBtn:hover {
+  background: rgba(72, 58, 114, 0.9);
+  border-color: rgba(230, 215, 255, 0.6);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.cardNavBtn:active {
+  transform: translateY(0);
+}
+
+.cardNavBtn:focus-visible {
+  outline: 2px solid #dfd1fa;
+}
+
+/* Minimized compact pill banner */
+.minimizedPill {
+  position: absolute;
+  bottom: clamp(20px, 4vh, 32px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(17, 14, 30, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(215, 200, 250, 0.35);
+  border-radius: 24px;
+  padding: 6px 10px;
+  box-shadow: 0 10px 28px rgba(3, 2, 8, 0.5);
+  animation: pillPop 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+  max-width: 90vw;
+}
+
+@keyframes pillPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.pillNavBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(210, 195, 250, 0.25);
+  color: #f1ecfa;
+  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.16s;
+}
+
+.pillNavBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pillNavBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pillContentBtn {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 6px;
+  color: #f3effa;
+  outline: none;
+}
+
+.pillYear {
+  font-family: monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #dfd1fa;
+  background: rgba(180, 160, 235, 0.22);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.pillTitle {
+  font-family: Georgia, serif;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.pillExpandIcon {
+  font-size: 10px;
+  color: rgba(220, 205, 250, 0.6);
+  transition: transform 0.16s;
+}
+
+.pillContentBtn:hover .pillExpandIcon {
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* Mobile responsive bottom sheet */
+@media (max-width: 768px) {
+  .cardContainer {
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 52vh;
+    border-radius: 18px 18px 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.65);
+    animation: sheetSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes sheetSlideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .cardHeader {
+    padding: 10px 14px 6px;
+  }
+
+  .cardBody {
+    padding: 10px 14px 12px;
+  }
+
+  .cardImageWrapper {
+    aspect-ratio: 16 / 9;
+    max-height: 120px;
+  }
+
+  .cardTitle {
+    font-size: 17px;
+    margin-bottom: 6px;
+  }
+
+  .cardText {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .cardFooterNav {
+    padding: 8px 14px 12px;
+  }
+
+  .cardNavBtn {
+    padding: 10px;
+    font-size: 12px;
+    min-height: 42px;
+  }
+}
+
+/* Fullscreen Celestial Lightbox Viewer (similar to Art section viewer) */
+.celestialViewer {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: rgba(6, 5, 15, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 24px 6vw calc(30px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: celestialExpand 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes celestialExpand {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.viewerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto 10px;
+}
+
+.viewerBackBtn {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 20px;
+  background: rgba(36, 30, 60, 0.85);
+  border: 1px solid rgba(210, 195, 250, 0.35);
+  color: #ded1f8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.viewerBackBtn:hover {
+  background: rgba(65, 52, 105, 0.95);
+  border-color: rgba(235, 220, 255, 0.6);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.viewerHeaderYear {
+  font-family: monospace;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: #c9b7e8;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  border: 1px solid rgba(210, 195, 250, 0.2);
+}
+
+.viewerImageFrame {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48svh;
+  max-height: 64svh;
+  position: relative;
+  margin: 10px auto;
+  max-width: 1100px;
+  width: 100%;
+}
+
+.viewerPhoto {
+  width: 100%;
+  height: 100%;
+  max-height: 64svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  position: relative;
+}
+
+.viewerPhoto img {
+  object-fit: contain !important;
+  max-height: 64svh !important;
+  border-radius: 6px;
+}
+
+.viewerCaptionArea {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 35px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 14px auto 0;
+  box-sizing: border-box;
+}
+
+.viewerStoryInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.viewerKicker {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  color: #c9b7e8;
+  margin: 0 0 6px 0;
+}
+
+.viewerTitle {
+  font-family: Georgia, serif;
+  font-size: clamp(26px, 3.5vw, 36px);
+  letter-spacing: -0.5px;
+  font-weight: 400;
+  color: #faf7ff;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.viewerText {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d8cde8;
+  margin: 0 0 8px 0;
+  max-width: 740px;
+}
+
+.viewerSubcaption {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  color: rgba(200, 185, 235, 0.7);
+  margin: 0;
+}
+
+.viewerCredit {
+  font-size: 11px;
+  opacity: 0.65;
+  color: #ded1f8;
+  display: block;
+  margin-top: 6px;
+}
+
+.viewerControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.viewerNavBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(36, 30, 60, 0.85);
+  border: 1px solid rgba(210, 195, 250, 0.35);
+  color: #ede5f8;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.viewerNavBtn:hover {
+  background: rgba(65, 52, 105, 0.95);
+  border-color: rgba(235, 220, 255, 0.6);
+  color: #ffffff;
+  transform: scale(1.06);
+}
+
+.viewerCounter {
+  font-family: monospace;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #c9b7e8;
+}
+
+@media (max-width: 768px) {
+  .celestialViewer {
+    padding: 16px 4vw calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .viewerImageFrame {
+    max-height: 48svh;
+    min-height: 36svh;
+  }
+
+  .viewerPhoto img {
+    max-height: 48svh !important;
+  }
+
+  .viewerCaptionArea {
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 10px;
+  }
+
+  .viewerTitle {
+    font-size: 23px;
+  }
+
+  .viewerText {
+    font-size: 13px;
+  }
+
+  .viewerControls {
+    align-self: center;
+    margin-top: 6px;
+  }
+}

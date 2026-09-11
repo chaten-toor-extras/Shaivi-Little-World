@@ -31,7 +31,7 @@ export const tokenService = {
     return {
       httpOnly: true,
       secure: isProd,
-      sameSite: isProd ? 'strict' : 'lax',
+      sameSite: isProd ? 'none' : 'lax',
       path: '/'
     };
   },

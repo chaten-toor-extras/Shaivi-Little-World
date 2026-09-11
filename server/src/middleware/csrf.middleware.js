@@ -23,7 +23,7 @@ export const setCsrfCookie = (req, res, next) => {
     res.cookie('csrf_token', token, {
       httpOnly: false, // Must be accessible to JS to send in header
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
     });
   }

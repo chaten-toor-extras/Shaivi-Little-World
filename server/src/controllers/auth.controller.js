@@ -20,7 +20,7 @@ export const login = asyncHandler(async (req, res) => {
   res.cookie('csrf_token', csrfToken, {
     httpOnly: false, // Must be readable by client JS to attach in X-CSRF-Token header
     secure: env.NODE_ENV === 'production',
-    sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/',
   });
 
@@ -56,7 +56,7 @@ export const getMe = asyncHandler(async (req, res) => {
     res.cookie('csrf_token', uuidv4(), {
       httpOnly: false,
       secure: env.NODE_ENV === 'production',
-      sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
     });
   }

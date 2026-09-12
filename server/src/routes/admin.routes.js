@@ -4,6 +4,7 @@ import { reorderSchema } from '../validators/common.validators.js';
 
 import * as artistCtrl from '../controllers/artist.controller.js';
 import * as artworkCtrl from '../controllers/artwork.controller.js';
+import * as collectibleCtrl from '../controllers/collectible.controller.js';
 import * as contactCtrl from '../controllers/contact.controller.js';
 import * as dashCtrl from '../controllers/dashboard.controller.js';
 import * as journeyCtrl from '../controllers/journey.controller.js';
@@ -11,16 +12,19 @@ import * as letterCtrl from '../controllers/letter.controller.js';
 import * as mediaCtrl from '../controllers/media.controller.js';
 import * as moodCtrl from '../controllers/mood.controller.js';
 import * as quoteCtrl from '../controllers/quote.controller.js';
+import * as secretCtrl from '../controllers/secret.controller.js';
 import * as siteCtrl from '../controllers/site.controller.js';
 import * as songCtrl from '../controllers/song.controller.js';
 import * as worldCtrl from '../controllers/worldSettings.controller.js';
 
 import { artistSchema } from '../validators/artist.validators.js';
 import { artworkSchema } from '../validators/artwork.validators.js';
+import { createCollectibleSchema, updateCollectibleSchema } from '../validators/collectible.validators.js';
 import { contactSettingsSchema } from '../validators/contact.validators.js';
 import { milestoneSchema } from '../validators/journey.validators.js';
 import { moodSchema } from '../validators/mood.validators.js';
 import { quoteSchema } from '../validators/quote.validators.js';
+import { createSecretSchema, updateSecretSchema } from '../validators/secret.validators.js';
 import { siteSchema } from '../validators/site.validators.js';
 import { songSchema } from '../validators/song.validators.js';
 import { worldSettingsPatchSchema } from '../validators/worldSettings.validators.js';
@@ -90,6 +94,21 @@ router.get('/letters', letterCtrl.getLetters);
 router.get('/letters/:id', letterCtrl.getLetter);
 router.patch('/letters/:id/status', letterCtrl.updateLetterStatus);
 router.delete('/letters/:id', letterCtrl.deleteLetter);
+
+// Secrets
+router.get('/secrets', secretCtrl.getSecrets);
+router.post('/secrets', validate(createSecretSchema), secretCtrl.createSecret);
+router.patch('/secrets/reorder', validate(reorderSchema), secretCtrl.reorderSecrets);
+router.post('/secrets/:id/duplicate', secretCtrl.duplicateSecret);
+router.patch('/secrets/:id', validate(updateSecretSchema), secretCtrl.updateSecret);
+router.delete('/secrets/:id', secretCtrl.deleteSecret);
+
+// Collectibles
+router.get('/collectibles', collectibleCtrl.getCollectibles);
+router.post('/collectibles', validate(createCollectibleSchema), collectibleCtrl.createCollectible);
+router.patch('/collectibles/reorder', validate(reorderSchema), collectibleCtrl.reorderCollectibles);
+router.patch('/collectibles/:id', validate(updateCollectibleSchema), collectibleCtrl.updateCollectible);
+router.delete('/collectibles/:id', collectibleCtrl.deleteCollectible);
 
 export default router;
 

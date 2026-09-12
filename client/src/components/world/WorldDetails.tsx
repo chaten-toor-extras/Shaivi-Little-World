@@ -1,4 +1,6 @@
+import { RESOLVED_WORLD_OBJECTS } from "@/data/worldLayout";
 import { useWorldSettings } from "@/providers/ContentProvider";
+import { safeEmitSecretEvent } from "@/services/secretEventBus";
 import { useExperienceStore } from "@/store/useExperienceStore";
 import type { ResolvedWorldTheme } from "@/types/world";
 import { resolveWorldTheme } from "@/utils/timeOfDay";
@@ -105,12 +107,17 @@ export default function WorldDetails({ theme }: WorldDetailsProps) {
       {/* Lamp */}
       {(details?.lampEnabled ?? true) && (
         <group
-          position={[-1.4, 0.13, 1.2]}
+          position={RESOLVED_WORLD_OBJECTS.LAMP}
           onClick={(e) => {
             if (allowed()) {
               e.stopPropagation();
               userOverrodeLamp.current = true;
               setLit(!lit);
+              safeEmitSecretEvent({
+                type: "TOGGLE",
+                targetType: "LAMP",
+                targetId: "main-lamp",
+              });
             }
           }}
         >
@@ -136,12 +143,21 @@ export default function WorldDetails({ theme }: WorldDetailsProps) {
       {(pond?.rippleEnabled ?? true) && (
         <>
           <mesh
-            position={[-2.7, 0.17, 2]}
+            position={[
+              RESOLVED_WORLD_OBJECTS.POND[0],
+              0.17,
+              RESOLVED_WORLD_OBJECTS.POND[2],
+            ]}
             rotation={[-Math.PI / 2, 0, 0]}
             onClick={(e) => {
               if (allowed()) {
                 e.stopPropagation();
                 rippleAge.current = 0;
+                safeEmitSecretEvent({
+                  type: "RIPPLE",
+                  targetType: "POND",
+                  targetId: "main-pond",
+                });
               }
             }}
           >
@@ -150,7 +166,11 @@ export default function WorldDetails({ theme }: WorldDetailsProps) {
           </mesh>
           <mesh
             ref={ripple}
-            position={[-2.7, 0.18, 2]}
+            position={[
+              RESOLVED_WORLD_OBJECTS.POND[0],
+              0.18,
+              RESOLVED_WORLD_OBJECTS.POND[2],
+            ]}
             rotation={[-Math.PI / 2, 0, 0]}
           >
             <ringGeometry args={[0.83, 0.88, 32]} />
@@ -165,7 +185,7 @@ export default function WorldDetails({ theme }: WorldDetailsProps) {
 
       {/* Bridge */}
       {(details?.bridgeVisible ?? true) && (
-        <group position={[-2.65, 0.25, 1.9]}>
+        <group position={RESOLVED_WORLD_OBJECTS.BRIDGE}>
           {Array.from({ length: 6 }, (_, i) => (
             <Box
               key={i}
@@ -181,7 +201,11 @@ export default function WorldDetails({ theme }: WorldDetailsProps) {
       {(details?.mugSteamEnabled ?? true) && (
         <>
           <mesh
-            position={[0.72, 1.16, 2.15]}
+            position={[
+              RESOLVED_WORLD_OBJECTS.DESK[0] - 0.68,
+              RESOLVED_WORLD_OBJECTS.DESK[1] + 1.04,
+              RESOLVED_WORLD_OBJECTS.DESK[2] + 0.05,
+            ]}
             scale={0.14}
             onClick={(e) => {
               if (allowed()) {
@@ -197,7 +221,11 @@ export default function WorldDetails({ theme }: WorldDetailsProps) {
             {[0, 1, 2].map((i) => (
               <Ball
                 key={i}
-                position={[0.72, 1.27 + i * 0.1, 2.15]}
+                position={[
+                  RESOLVED_WORLD_OBJECTS.DESK[0] - 0.68,
+                  RESOLVED_WORLD_OBJECTS.DESK[1] + 1.15 + i * 0.1,
+                  RESOLVED_WORLD_OBJECTS.DESK[2] + 0.05,
+                ]}
                 scale={[0.05, 0.08, 0.05]}
                 color="#efdfcb"
                 castShadow={false}
@@ -209,7 +237,23 @@ export default function WorldDetails({ theme }: WorldDetailsProps) {
 
       {/* Books */}
       {(details?.booksVisible ?? true) && (
-        <group position={[2.9, 0.5, 1.4]}>
+        <group
+          position={[
+            RESOLVED_WORLD_OBJECTS.BENCH[0],
+            RESOLVED_WORLD_OBJECTS.BENCH[1] + 0.15,
+            RESOLVED_WORLD_OBJECTS.BENCH[2],
+          ]}
+          onClick={(e) => {
+            if (allowed()) {
+              e.stopPropagation();
+              safeEmitSecretEvent({
+                type: "CLICK",
+                targetType: "BOOKS",
+                targetId: "island-books",
+              });
+            }
+          }}
+        >
           {["#9485a0", "#c3ac78", "#879773"].map((c, i) => (
             <Box
               key={c}
@@ -229,9 +273,9 @@ export default function WorldDetails({ theme }: WorldDetailsProps) {
             <mesh
               key={i}
               position={[
-                Math.sin(i * 2.4) * 3,
+                Math.sin(i * 2.4) * 4.2,
                 0.5 + (i % 4) * 0.35,
-                Math.cos(i * 2.4) * 2,
+                Math.cos(i * 2.4) * 3.0,
               ]}
             >
               <sphereGeometry args={[0.035, 8, 8]} />

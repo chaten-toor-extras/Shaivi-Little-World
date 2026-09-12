@@ -11,6 +11,8 @@
     "seed:content": "node src/scripts/seedContent.js",
     "seed:world": "node src/scripts/seedWorld.js",
     "seed:journey": "node src/scripts/seedJourney.js",
+    "seed:secrets": "node src/scripts/seedSecrets.js",
+    "seed:collectibles": "node src/scripts/seedCollectibles.js",
     "test": "vitest run"
   },
   "dependencies": {

@@ -1,0 +1,114 @@
+.hudContainer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hudButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(232, 223, 229, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(64, 62, 69, 0.2);
+  border-radius: 25px;
+  padding: 0 15px;
+  height: 41px;
+  box-sizing: border-box;
+  cursor: pointer;
+  color: #38343f;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  white-space: nowrap;
+}
+
+.hudButton:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(64, 62, 69, 0.35);
+  color: #875d4c;
+  transform: translateY(-1px);
+}
+
+.hudButton:active {
+  transform: translateY(0);
+}
+
+.hudButton:focus-visible {
+  box-shadow: 0 0 0 2px rgba(184, 147, 126, 0.5);
+}
+
+.hudSparkle {
+  color: #d4a359;
+  font-size: 0.9rem;
+  display: inline-block;
+  transition: transform 0.3s ease;
+  line-height: 1;
+}
+
+.hudButton:hover .hudSparkle {
+  transform: rotate(15deg) scale(1.15);
+}
+
+.hudCount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: inherit;
+  font-size: 13px;
+}
+
+.hudLabel {
+  color: inherit;
+  opacity: 0.8;
+  font-size: 13px;
+  margin-left: 2px;
+}
+
+/* Dark mode compatibility with globals.css theme system */
+:global(.experience[data-theme="dark"]) .hudButton {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  color: #f7f4f9;
+}
+
+:global(.experience[data-theme="dark"]) .hudButton:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+}
+
+:global(.experience[data-theme="dark"]) .hudSparkle {
+  color: #f7d070;
+}
+
+@media (max-width: 680px) {
+  .hudButton {
+    height: 35px;
+    padding: 0 11px;
+    font-size: 12px;
+    gap: 5px;
+  }
+  .hudCount {
+    font-size: 12px;
+  }
+  .hudLabel {
+    display: none;
+  }
+}

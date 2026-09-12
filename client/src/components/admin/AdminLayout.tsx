@@ -17,6 +17,8 @@ import {
   PictureOutlined,
   SettingOutlined,
   UserOutlined,
+  BulbOutlined,
+  GiftOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Avatar, Badge, Button, Drawer, Dropdown, Layout, Menu } from "antd";
@@ -53,6 +55,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       "/admin/music",
       "/admin/contact",
       "/admin/letters",
+      "/admin/secrets",
+      "/admin/collectibles",
       "/admin/settings",
     ];
     routes.forEach((route) => {
@@ -123,6 +127,16 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </Badge>
       ),
       label: `Letters ${unreadCount > 0 ? `(${unreadCount})` : ""}`,
+    },
+    {
+      key: "/admin/secrets",
+      icon: <BulbOutlined />,
+      label: "Secrets & Eggs",
+    },
+    {
+      key: "/admin/collectibles",
+      icon: <GiftOutlined />,
+      label: "Collectibles",
     },
     {
       key: "/admin/settings",

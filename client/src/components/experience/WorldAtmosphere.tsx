@@ -229,10 +229,10 @@ export default function WorldAtmosphere({
           intensity={theme.directional.intensity}
           castShadow={canCastShadow}
           shadow-mapSize={[shadowMapResolution, shadowMapResolution]}
-          shadow-camera-left={-8}
-          shadow-camera-right={8}
-          shadow-camera-top={8}
-          shadow-camera-bottom={-8}
+          shadow-camera-left={-11}
+          shadow-camera-right={11}
+          shadow-camera-top={11}
+          shadow-camera-bottom={-11}
           shadow-normalBias={0.05}
         />
       )}

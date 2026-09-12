@@ -8,6 +8,7 @@ import {
   EyeOutlined,
   InboxOutlined,
   MailOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -15,17 +16,19 @@ import {
   Button,
   Card,
   Drawer,
+  Dropdown,
   Input,
   Popconfirm,
   Segmented,
   Space,
   Table,
   Tag,
+  Tooltip,
 } from "antd";
 import { useState } from "react";
 
 export default function AdminLettersPage() {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [search, setSearch] = useState("");
@@ -132,26 +135,45 @@ export default function AdminLettersPage() {
     {
       title: "Actions",
       key: "actions",
-      width: 120,
+      width: 80,
+      align: "center" as const,
       render: (_: any, record: Letter) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => handleOpenLetter(record)}
-          >
-            Read
-          </Button>
-          <Popconfirm
-            title="Delete letter permanently?"
-            onConfirm={() => deleteMutation.mutate(record._id)}
-            okText="Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "read",
+                label: "Read Letter",
+                icon: <EyeOutlined />,
+                onClick: () => handleOpenLetter(record),
+              },
+              {
+                type: "divider",
+              },
+              {
+                key: "delete",
+                label: "Delete Letter",
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () => {
+                  modal.confirm({
+                    title: "Delete letter permanently?",
+                    content: "Are you sure? This cannot be undone.",
+                    okText: "Delete",
+                    okType: "danger",
+                    onOk: () => deleteMutation.mutate(record._id),
+                  });
+                },
+              },
+            ],
+          }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <Tooltip title="Actions">
+            <Button size="small" type="text" icon={<MoreOutlined style={{ fontSize: "16px" }} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];
@@ -222,7 +244,8 @@ export default function AdminLettersPage() {
       <Drawer
         title="Letter Details"
         placement="right"
-        size={480}
+        size="large"
+        styles={{ wrapper: { width: "min(480px, 100vw)" } }}
         onClose={() => setActiveLetter(null)}
         open={!!activeLetter}
         extra={

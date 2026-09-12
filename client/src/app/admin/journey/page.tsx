@@ -10,6 +10,7 @@ import {
   ArrowUpOutlined,
   DeleteOutlined,
   EditOutlined,
+  MoreOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,6 +20,7 @@ import {
   Button,
   Card,
   ColorPicker,
+  Dropdown,
   Form,
   Grid,
   Input,
@@ -29,12 +31,13 @@ import {
   Space,
   Switch,
   Table,
+  Tooltip,
 } from "antd";
 import { useState } from "react";
 
 export default function AdminJourneyPage() {
   const screens = Grid.useBreakpoint();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingMilestone, setEditingMilestone] =
@@ -307,25 +310,45 @@ export default function AdminJourneyPage() {
     {
       title: "Actions",
       key: "actions",
-      width: 110,
+      width: 80,
+      align: "center" as const,
       render: (_: any, record: JourneyMilestone) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          />
-          <Popconfirm
-            title="Delete milestone?"
-            description="This will remove this star from the constellation."
-            onConfirm={() => deleteMutation.mutate(record._id)}
-            okText="Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "edit",
+                label: "Edit Milestone",
+                icon: <EditOutlined />,
+                onClick: () => handleEdit(record),
+              },
+              {
+                type: "divider",
+              },
+              {
+                key: "delete",
+                label: "Delete Milestone",
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () => {
+                  modal.confirm({
+                    title: "Delete milestone?",
+                    content: "This will remove this star from the constellation.",
+                    okText: "Delete",
+                    okType: "danger",
+                    onOk: () => deleteMutation.mutate(record._id),
+                  });
+                },
+              },
+            ],
+          }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <Tooltip title="Actions">
+            <Button size="small" type="text" icon={<MoreOutlined style={{ fontSize: "16px" }} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];

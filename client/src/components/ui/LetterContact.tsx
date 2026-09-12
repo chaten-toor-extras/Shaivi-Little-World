@@ -2,6 +2,8 @@
 
 import { useContactSettings } from "@/providers/ContentProvider";
 import { contentService } from "@/services/content.service";
+import { safeEmitSecretEvent } from "@/services/secretEventBus";
+import { useSecretStore } from "@/store/useSecretStore";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 export default function LetterContact() {
@@ -52,7 +54,15 @@ export default function LetterContact() {
         message: formData.message.trim(),
       });
 
-      // API confirmed persistence -> now trigger the folding animation
+      // API confirmed persistence -> update secret session state & emit event
+      useSecretStore.getState().setLetterSentSession(true);
+      safeEmitSecretEvent({
+        type: "LETTER_SENT",
+        targetType: "MAILBOX",
+        targetId: "contact-mailbox",
+      });
+
+      // Trigger the folding animation
       setStatus("folding");
       timeout.current = setTimeout(() => {
         setStatus("ready");

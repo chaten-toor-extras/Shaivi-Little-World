@@ -1,0 +1,9 @@
+﻿.controls { position: fixed; z-index: 45; left: max(16px, env(safe-area-inset-left)); top: 90px; color: #454a3f; }
+.controls[hidden] { display: none; }
+.controls button { background: #f4eedf; color: #454a3f; border: 1px solid #776c5940; border-radius: 7px; min-height: 44px; padding: 10px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+.controls button:disabled { opacity: .45; cursor: default; }
+.controls button:focus-visible { outline: 3px solid #725d8c; outline-offset: 3px; }
+.keyboardControls, .announcement { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.keyboardControls:focus-within { position: fixed; left: 50%; bottom: 78px; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); height: auto; clip-path: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; background: #806d57; border-radius: 10px; }
+@media (max-width: 600px) { .controls { top: 78px; } }
+@media (max-height: 450px) { .controls { top: 65px; } }

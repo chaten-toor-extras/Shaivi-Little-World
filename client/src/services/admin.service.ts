@@ -2,6 +2,7 @@ import type {
   ApiResponse,
   ArtistContent,
   Artwork,
+  Collectible,
   ContactSettings,
   DashboardStats,
   JourneyMilestone,
@@ -10,6 +11,7 @@ import type {
   Mood,
   PaginatedResponse,
   Quote,
+  Secret,
   SiteSettings,
   Song,
   WorldSettings,
@@ -251,5 +253,60 @@ export const adminService = {
       ? `/admin/world/reset/${section}`
       : "/admin/world/reset";
     return apiPost<WorldSettings>(url, {});
+  },
+
+  // ── Secrets (Phase 8) ──────────────────────────────────────
+  getSecrets: async (): Promise<Secret[]> => {
+    const res = await apiGet<Secret[]>("/admin/secrets");
+    return res.data;
+  },
+  createSecret: async (
+    data: Partial<Secret>,
+  ): Promise<ApiResponse<Secret>> => {
+    return apiPost<Secret>("/admin/secrets", data);
+  },
+  updateSecret: async (
+    id: string,
+    data: Partial<Secret>,
+  ): Promise<ApiResponse<Secret>> => {
+    const { _id, __v, createdAt, updatedAt, ...cleanData } = data as any;
+    return apiPatch<Secret>(`/admin/secrets/${id}`, cleanData);
+  },
+  deleteSecret: async (id: string): Promise<ApiResponse<null>> => {
+    return apiDelete<null>(`/admin/secrets/${id}`);
+  },
+  duplicateSecret: async (id: string): Promise<ApiResponse<Secret>> => {
+    return apiPost<Secret>(`/admin/secrets/${id}/duplicate`, {});
+  },
+  reorderSecrets: async (
+    items: ReorderItem[],
+  ): Promise<ApiResponse<null>> => {
+    return apiPatch<null>("/admin/secrets/reorder", { items });
+  },
+
+  // ── Collectibles (Phase 9) ──────────────────────────────────
+  getCollectibles: async (): Promise<Collectible[]> => {
+    const res = await apiGet<Collectible[]>("/admin/collectibles");
+    return res.data;
+  },
+  createCollectible: async (
+    data: Partial<Collectible>,
+  ): Promise<ApiResponse<Collectible>> => {
+    return apiPost<Collectible>("/admin/collectibles", data);
+  },
+  updateCollectible: async (
+    id: string,
+    data: Partial<Collectible>,
+  ): Promise<ApiResponse<Collectible>> => {
+    const { _id, __v, createdAt, updatedAt, ...cleanData } = data as any;
+    return apiPatch<Collectible>(`/admin/collectibles/${id}`, cleanData);
+  },
+  deleteCollectible: async (id: string): Promise<ApiResponse<null>> => {
+    return apiDelete<null>(`/admin/collectibles/${id}`);
+  },
+  reorderCollectibles: async (
+    items: ReorderItem[],
+  ): Promise<ApiResponse<null>> => {
+    return apiPatch<null>("/admin/collectibles/reorder", { items });
   },
 };

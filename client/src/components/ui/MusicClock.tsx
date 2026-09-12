@@ -1,6 +1,7 @@
 "use client";
 
 import { useMusic } from "@/providers/ContentProvider";
+import { safeEmitSecretEvent } from "@/services/secretEventBus";
 import { useMusicStore } from "@/store/useMusicStore";
 import { useEffect, useState, type CSSProperties } from "react";
 import Photo from "./Photo";
@@ -100,6 +101,13 @@ export default function MusicClock() {
       }
       const newPlaylist = getMoodPlaylist(m);
       setPlaylistInStore(newPlaylist, 0);
+
+      // Fire user-initiated mood selection event
+      safeEmitSecretEvent({
+        type: "MOOD_SELECTED",
+        targetType: "CLOCK",
+        metadata: { moodId: String(m._id || m.slug || index) },
+      });
     }
   };
 

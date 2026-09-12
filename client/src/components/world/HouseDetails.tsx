@@ -1,3 +1,4 @@
+import { safeEmitSecretEvent } from "@/services/secretEventBus";
 import { useExperienceStore } from "@/store/useExperienceStore";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
@@ -97,7 +98,19 @@ export default function HouseDetails({
         scale={[0.04, 0.8, 0.75]}
         color="#947656"
       />
-      <mesh position={[1.096, 1, 0.1]}>
+      <mesh
+        position={[1.096, 1, 0.1]}
+        onClick={(e) => {
+          if (useExperienceStore.getState().mode === "WORLD") {
+            e.stopPropagation();
+            safeEmitSecretEvent({
+              type: "CLICK",
+              targetType: "HOUSE_WINDOW",
+              targetId: "front-window",
+            });
+          }
+        }}
+      >
         <boxGeometry args={[0.02, 0.63, 0.6]} />
         <meshStandardMaterial
           ref={winMat}

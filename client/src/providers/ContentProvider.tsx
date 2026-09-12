@@ -7,18 +7,21 @@ import type {
   ContactSettings,
   JourneyMilestone,
   Mood,
+  PublicCollectible,
   PublicContentResponse,
+  PublicSecret,
   Quote,
   SiteSettings,
   Song,
   WorldSettings,
 } from "@/types";
+import { useCollectibleStore } from "@/store/useCollectibleStore";
 import {
   DEFAULT_WORLD_SETTINGS,
   normalizeWorldSettings,
 } from "@/utils/worldDefaults";
 import { useQuery } from "@tanstack/react-query";
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 
 // Import existing static data as emergency fallbacks
 import { artist as staticArtist } from "@/data/artist";
@@ -140,6 +143,118 @@ const fallbackData: PublicContentResponse = {
     isPublished: true,
   },
   world: DEFAULT_WORLD_SETTINGS,
+  secrets: [
+    {
+      _id: "sec-butterfly",
+      id: "sec-butterfly",
+      name: "Butterfly Whisper",
+      slug: "butterfly-whisper",
+      enabled: true,
+      isPublished: true,
+      order: 0,
+      target: { type: "BUTTERFLY", id: "golden-butterfly" },
+      trigger: { type: "MULTI_CLICK", requiredCount: 3, windowMs: 12000 },
+      conditions: {},
+      reveal: {
+        type: "MESSAGE",
+        title: "✦ Enchanted Discovery ✦",
+        message:
+          "You caught the golden butterfly! A fleeting whisper from Shaivi’s field guide.",
+        visualEffect: "SPARKLE",
+        position: "center",
+        duration: "NORMAL",
+      },
+      behavior: { repeatable: true, cooldownMs: 15000 },
+    },
+    {
+      _id: "sec-flying-paper",
+      id: "sec-flying-paper",
+      name: "Enchanted Flying Manuscript",
+      slug: "flying-paper",
+      enabled: true,
+      isPublished: true,
+      order: 1,
+      target: { type: "FLYING_PAGE", id: "flying-paper" },
+      trigger: { type: "MULTI_CLICK", requiredCount: 3, windowMs: 12000 },
+      conditions: {},
+      reveal: {
+        type: "MESSAGE",
+        title: "✦ The Wandering Manuscript ✦",
+        message:
+          'You caught the enchanted flying page! It carries a gentle message written in gold ink: "Some stories refuse to stay bound in books—they take flight across the open sky."',
+        visualEffect: "PETALS",
+        position: "center",
+        duration: "NORMAL",
+      },
+      behavior: { repeatable: true, cooldownMs: 15000 },
+    },
+  ],
+  collectibles: [
+    {
+      _id: "col-little-star",
+      id: "col-little-star",
+      name: "Little Star",
+      slug: "little-star",
+      description: "A tiny celestial fragment that fell from the night sky, still holding a gentle glimmer.",
+      hint: "Where the water softly catches the sky.",
+      category: "STAR",
+      rarity: "COMMON",
+      source: "WORLD",
+      enabled: true,
+      isPublished: true,
+      order: 0,
+      model: {
+        modelKey: "tiny_star",
+        scalePreset: "NORMAL",
+        rotationPreset: "DEFAULT",
+      },
+      appearance: {
+        glowColor: "#ffe8b2",
+        accentColor: "#f7d070",
+        idleAnimation: "FLOAT",
+        revealEffect: "TINY_STARS",
+      },
+      placement: {
+        anchor: "POND_EDGE",
+        offset: { x: 0.15, y: 0.05, z: 0.2 },
+      },
+      behavior: {
+        hideAfterCollected: true,
+      },
+    },
+    {
+      _id: "col-golden-wing",
+      id: "col-golden-wing",
+      name: "Golden Wing",
+      slug: "golden-wing",
+      description: "An ethereal gossamer butterfly wing inscribed with golden starlight.",
+      hint: "Awarded to those who greet the winged visitor more than once.",
+      category: "MAGIC",
+      rarity: "RARE",
+      source: "SECRET",
+      enabled: true,
+      isPublished: true,
+      order: 1,
+      model: {
+        modelKey: "golden_wing",
+        scalePreset: "FEATURED",
+        rotationPreset: "UPRIGHT",
+      },
+      appearance: {
+        glowColor: "#ffe082",
+        accentColor: "#ffb300",
+        idleAnimation: "SLOW_SPIN",
+        revealEffect: "GLOW",
+      },
+      placement: {
+        anchor: "FLOWER_FIELD",
+        offset: { x: 0, y: 0, z: 0 },
+      },
+      behavior: {
+        hideAfterCollected: true,
+      },
+    },
+  ],
 };
 
 interface ContentContextValue {
@@ -167,6 +282,12 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   });
 
   const content = data || fallbackData;
+
+  useEffect(() => {
+    if (content.collectibles && content.collectibles.length > 0) {
+      useCollectibleStore.getState().setDefinitions(content.collectibles);
+    }
+  }, [content.collectibles]);
 
   return (
     <ContentContext.Provider
@@ -233,7 +354,17 @@ export const WorldSettingsOverrideContext = createContext<WorldSettings | null>(
 
 export function useWorldSettings(): WorldSettings {
   const override = useContext(WorldSettingsOverrideContext);
-  if (override) return override;
   const ctx = useContext(ContentContext);
+  if (override) return override;
   return normalizeWorldSettings(ctx.content.world);
+}
+
+export function useSecrets(): PublicSecret[] {
+  const ctx = useContext(ContentContext);
+  return ctx.content.secrets || [];
+}
+
+export function useCollectibles(): PublicCollectible[] {
+  const ctx = useContext(ContentContext);
+  return ctx.content.collectibles || [];
 }

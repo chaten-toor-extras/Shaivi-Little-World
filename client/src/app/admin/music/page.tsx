@@ -13,6 +13,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   GlobalOutlined,
+  MoreOutlined,
   PlusOutlined,
   SmileOutlined,
 } from "@ant-design/icons";
@@ -23,6 +24,7 @@ import {
   Button,
   Card,
   Col,
+  Dropdown,
   Form,
   Input,
   InputNumber,
@@ -35,12 +37,13 @@ import {
   Table,
   Tabs,
   Tag,
+  Tooltip,
   Typography,
 } from "antd";
 import { useState } from "react";
 
 export default function AdminMusicPage() {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("songs");
 
@@ -271,24 +274,45 @@ export default function AdminMusicPage() {
     {
       title: "Actions",
       key: "actions",
-      width: 100,
+      width: 80,
+      align: "center" as const,
       render: (_: any, record: Song) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEditSong(record)}
-          />
-          <Popconfirm
-            title="Delete song?"
-            onConfirm={() => deleteSongMutation.mutate(record._id)}
-            okText="Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "edit",
+                label: "Edit Song",
+                icon: <EditOutlined />,
+                onClick: () => handleEditSong(record),
+              },
+              {
+                type: "divider",
+              },
+              {
+                key: "delete",
+                label: "Delete Song",
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () => {
+                  modal.confirm({
+                    title: "Delete song?",
+                    content: `Are you sure you want to delete "${record.title}"?`,
+                    okText: "Delete",
+                    okType: "danger",
+                    onOk: () => deleteSongMutation.mutate(record._id),
+                  });
+                },
+              },
+            ],
+          }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <Tooltip title="Actions">
+            <Button size="small" type="text" icon={<MoreOutlined style={{ fontSize: "16px" }} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];
@@ -364,24 +388,45 @@ export default function AdminMusicPage() {
     {
       title: "Actions",
       key: "actions",
-      width: 100,
+      width: 80,
+      align: "center" as const,
       render: (_: any, record: Mood) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEditMood(record)}
-          />
-          <Popconfirm
-            title="Delete mood?"
-            onConfirm={() => deleteMoodMutation.mutate(record._id)}
-            okText="Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "edit",
+                label: "Edit Mood",
+                icon: <EditOutlined />,
+                onClick: () => handleEditMood(record),
+              },
+              {
+                type: "divider",
+              },
+              {
+                key: "delete",
+                label: "Delete Mood",
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () => {
+                  modal.confirm({
+                    title: "Delete mood?",
+                    content: `Are you sure you want to delete "${record.name}"?`,
+                    okText: "Delete",
+                    okType: "danger",
+                    onOk: () => deleteMoodMutation.mutate(record._id),
+                  });
+                },
+              },
+            ],
+          }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <Tooltip title="Actions">
+            <Button size="small" type="text" icon={<MoreOutlined style={{ fontSize: "16px" }} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];

@@ -1,23 +1,19 @@
+import { CAMERA_FOCUS_TARGETS } from "@/data/worldLayout";
+import { useCameraNavigationStore } from "@/components/world/navigation/cameraNavigationStore";
+import { fitCameraToIsland } from "@/components/world/navigation/fitCameraToIsland";
 import { useWorldSettings } from "@/providers/ContentProvider";
 import { useExperienceStore, type Mode } from "@/store/useExperienceStore";
 import { useThree } from "@react-three/fiber";
 import { gsap } from "gsap";
 import { useEffect, useRef } from "react";
 import { PerspectiveCamera, Vector3 } from "three";
+import { QUOTE_TV, TV_FOCUS, quoteCameraDistance } from "../world/quote-tv/quoteTVConfig";
+import { useQuoteTV } from "../world/quote-tv/QuoteTVContext";
 
-export const anchors: Record<
-  Exclude<Mode, "INTRO" | "WORLD">,
-  [number, number, number]
-> = {
-  ABOUT: [0, 1.1, -0.9],
-  QUOTES: [1.4, 1.52, 2.18],
-  GALLERY: [-2.8, 1.05, -0.3],
-  JOURNEY: [1.65, 1.8, -2.5],
-  CONTACT: [-0.5, 0.8, 3.1],
-  MUSIC: [3, 0.8, 0.3],
-};
+export const anchors = CAMERA_FOCUS_TARGETS;
 
 export default function CameraRig() {
+  const inWorldQuotes = !!useQuoteTV()?.enabled;
   const { camera, size } = useThree();
   const mode = useExperienceStore((s) => s.mode);
   const reduced = useExperienceStore((s) => s.reducedMotion);
@@ -26,11 +22,15 @@ export default function CameraRig() {
 
   useEffect(() => {
     const cam = camera as PerspectiveCamera;
-    const mobile = size.width < 700;
     const world = mode === "WORLD" || mode === "INTRO";
+    if (mode === "QUOTES" && inWorldQuotes) useExperienceStore.setState({ transitioning: true });
+    const defaultFit = fitCameraToIsland(size.width, size.height);
+    const savedPose = useCameraNavigationStore.getState().savedExplorationPose;
+
     const destination = world
-      ? new Vector3(0, mobile ? 0.95 : 0.85, 0)
-      : new Vector3(...anchors[mode]);
+      ? (savedPose ? savedPose.target.clone() : defaultFit.target.clone())
+      : new Vector3(...CAMERA_FOCUS_TARGETS[mode]);
+    if (mode === "QUOTES" && inWorldQuotes) destination.set(QUOTE_TV[0] + TV_FOCUS[0], QUOTE_TV[1] + TV_FOCUS[1], QUOTE_TV[2] + TV_FOCUS[2]);
 
     // Fit the screen to both viewport axes, including portrait displays.
     const screenDistance = Math.max(
@@ -42,15 +42,18 @@ export default function CameraRig() {
           0.85),
     );
     const end = world
-      ? new Vector3(
-          ...(mobile ? ([10.5, 12.8, 19] as const) : ([10.5, 11, 17] as const)),
-        )
+      ? (savedPose ? savedPose.position.clone() : defaultFit.position.clone())
       : mode === "QUOTES"
-        ? new Vector3(1.4, 1.52, 2.18 + screenDistance)
+        ? new Vector3(destination.x, destination.y, destination.z + screenDistance)
         : destination.clone().add(new Vector3(2.5, 2.1, 5.6));
 
     const start = cam.position.clone();
     const fromTarget = target.current.clone();
+    if (mode === "QUOTES" && inWorldQuotes) {
+      // Start along the actual free-camera sightline, even after orbit/pan.
+      fromTarget.copy(start).add(camera.getWorldDirection(new Vector3()).multiplyScalar(
+        Math.max(0.1, start.distanceTo(savedPose?.target || target.current))));
+    }
     const startFov = cam.fov;
 
     // Framing FOV offset
@@ -61,8 +64,10 @@ export default function CameraRig() {
           ? 4
           : 0;
 
-    const baseEndFov = world ? (mobile ? 45 : 38) : mode === "QUOTES" ? 37 : 42;
+    const baseEndFov = world ? defaultFit.fov : mode === "QUOTES" ? 37 : 42;
     const endFov = Math.max(25, Math.min(65, baseEndFov + framingOffset));
+    if (mode === "QUOTES" && inWorldQuotes) end.copy(destination).add(new Vector3(0, 0,
+      quoteCameraDistance(size.width, size.height, endFov)));
 
     // Camera speed calculation
     const speedSetting = worldSettings.camera?.travelSpeed || "NORMAL";
@@ -125,6 +130,7 @@ export default function CameraRig() {
     };
   }, [
     camera,
+    inWorldQuotes,
     mode,
     reduced,
     size.width,

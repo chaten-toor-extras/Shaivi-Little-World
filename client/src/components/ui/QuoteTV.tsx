@@ -1,25 +1,21 @@
 "use client";
 
-import { useQuotes } from "@/providers/ContentProvider";
-import { useEffect, useState } from "react";
+import { useQuotePlayer } from "../world/quote-tv/useQuotePlayer";
+import { useEffect } from "react";
 
 export default function QuoteTV() {
-  const quotes = useQuotes();
-  const [index, setIndex] = useState(0);
-  const [on, setOn] = useState(true);
-
-  const total = quotes?.length || 0;
+  const { quotes, index, on, total, tune, toggle } = useQuotePlayer();
 
   useEffect(() => {
-    if (total === 0) return;
+    if (total < 2 || !on) return;
     const key = (e: KeyboardEvent) => {
       if (e.defaultPrevented) return;
-      if (e.key === "ArrowLeft") setIndex((i) => (i + total - 1) % total);
-      if (e.key === "ArrowRight") setIndex((i) => (i + 1) % total);
+      if (e.key === "ArrowLeft") { e.preventDefault(); tune(-1, total); }
+      if (e.key === "ArrowRight") { e.preventDefault(); tune(1, total); }
     };
     document.addEventListener("keydown", key);
     return () => document.removeEventListener("keydown", key);
-  }, [total]);
+  }, [total, tune, on]);
 
   // Ensure index is within range if quotes count changes
   const safeIndex = total > 0 ? index % total : 0;
@@ -60,14 +56,14 @@ export default function QuoteTV() {
             <button
               aria-label="Previous quote"
               disabled={!on || total === 0}
-              onClick={() => setIndex((safeIndex + total - 1) % total)}
+              onClick={() => tune(-1, total)}
             >
               ←
             </button>
             <button
               aria-label="Next quote"
               disabled={!on || total === 0}
-              onClick={() => setIndex((safeIndex + 1) % total)}
+              onClick={() => tune(1, total)}
             >
               →
             </button>
@@ -77,7 +73,7 @@ export default function QuoteTV() {
             className="tv-power"
             aria-label={on ? "Turn television off" : "Turn television on"}
             aria-pressed={on}
-            onClick={() => setOn(!on)}
+            onClick={toggle}
           >
             ⏻
           </button>

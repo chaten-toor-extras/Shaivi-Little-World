@@ -7,6 +7,7 @@ import {
   ArrowUpOutlined,
   DeleteOutlined,
   EditOutlined,
+  MoreOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +16,7 @@ import {
   App,
   Button,
   Card,
+  Dropdown,
   Form,
   Input,
   Modal,
@@ -23,11 +25,12 @@ import {
   Switch,
   Table,
   Tag,
+  Tooltip,
 } from "antd";
 import { useState } from "react";
 
 export default function AdminQuotesPage() {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
@@ -177,25 +180,45 @@ export default function AdminQuotesPage() {
     {
       title: "Actions",
       key: "actions",
-      width: 120,
+      width: 80,
+      align: "center" as const,
       render: (_: any, record: Quote) => (
-        <Space orientation="horizontal">
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          />
-          <Popconfirm
-            title="Delete quote?"
-            description="This will remove this quote from the TV broadcast."
-            onConfirm={() => deleteMutation.mutate(record._id)}
-            okText="Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "edit",
+                label: "Edit Quote",
+                icon: <EditOutlined />,
+                onClick: () => handleEdit(record),
+              },
+              {
+                type: "divider",
+              },
+              {
+                key: "delete",
+                label: "Delete Quote",
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () => {
+                  modal.confirm({
+                    title: "Delete quote?",
+                    content: "This will remove this quote from the TV broadcast.",
+                    okText: "Delete",
+                    okType: "danger",
+                    onOk: () => deleteMutation.mutate(record._id),
+                  });
+                },
+              },
+            ],
+          }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <Tooltip title="Actions">
+            <Button size="small" type="text" icon={<MoreOutlined style={{ fontSize: "16px" }} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];

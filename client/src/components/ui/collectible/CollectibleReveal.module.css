@@ -1,0 +1,139 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 96;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(30, 22, 26, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: #fcf9f4;
+  border: 1px solid rgba(214, 192, 176, 0.7);
+  box-shadow: 0 16px 40px rgba(58, 41, 35, 0.22);
+  border-radius: 20px;
+  padding: 28px 24px 22px;
+  text-align: center;
+  animation: popUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes popUp {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8c7162;
+  margin-bottom: 8px;
+}
+
+.kickerIcon {
+  color: #d4a359;
+  font-size: 0.85rem;
+}
+
+.previewContainer {
+  width: 150px;
+  height: 150px;
+  margin: 8px auto 14px;
+  position: relative;
+}
+
+.title {
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: #2b211c;
+  margin: 0 0 8px;
+}
+
+.categoryTag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(228, 208, 192, 0.45);
+  color: #7d5b4a;
+  border-radius: 12px;
+  padding: 3px 10px;
+  margin-bottom: 12px;
+}
+
+.description {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #584a44;
+  margin: 0 0 20px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.continueBtn {
+  background: #7d6153;
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  padding: 9px 24px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.continueBtn:hover {
+  background: #6a4f42;
+  transform: translateY(-1px);
+}
+
+.bookBtn {
+  background: transparent;
+  color: #7d6153;
+  border: 1px solid rgba(125, 97, 83, 0.4);
+  border-radius: 20px;
+  padding: 9px 20px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bookBtn:hover {
+  background: rgba(125, 97, 83, 0.08);
+}
+

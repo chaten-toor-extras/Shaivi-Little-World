@@ -1,8 +1,10 @@
 "use client";
 
+import { safeEmitSecretEvent } from "@/services/secretEventBus";
+import { useSecretStore } from "@/store/useSecretStore";
 import type { JourneyMilestone } from "@/types";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import JourneyStarCard from "./JourneyStarCard";
 import TelescopeAccessibleControls from "./TelescopeAccessibleControls";
 import styles from "./TelescopeJourney.module.css";
@@ -55,10 +57,27 @@ export default function TelescopeJourney({
   const safeActiveIndex =
     total > 0 ? Math.max(0, Math.min(total - 1, activeIndex)) : 0;
   const currentMilestone = total > 0 ? milestones[safeActiveIndex] : null;
+  // Guarded single emission for genuine Journey exploration
+  const journeyViewedEmitted = useRef(false);
+  useEffect(() => {
+    if (!journeyViewedEmitted.current && !useSecretStore.getState().journeyViewedSession && milestones.length > 0) {
+      journeyViewedEmitted.current = true;
+      useSecretStore.getState().setJourneyViewedSession(true);
+      safeEmitSecretEvent({
+        type: "JOURNEY_VIEWED",
+        targetType: "TELESCOPE",
+      });
+    }
+  }, [milestones.length]);
 
   const handleSelectStar = useCallback((index: number) => {
     setActiveIndex(index);
     setCardOpen(true);
+    safeEmitSecretEvent({
+      type: "CLICK",
+      targetType: "TELESCOPE",
+      metadata: { starIndex: index },
+    });
   }, []);
 
   const handlePrev = useCallback(() => {

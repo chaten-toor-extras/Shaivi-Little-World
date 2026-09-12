@@ -7,12 +7,14 @@ import {
 import { useExperienceStore } from "@/store/useExperienceStore";
 import { useMusicStore } from "@/store/useMusicStore";
 import { resolveWorldTheme } from "@/utils/timeOfDay";
-import { OrbitControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { Group } from "three";
 import Clouds from "../world/Clouds";
 import FlyingPage from "../world/FlyingPage";
+import Butterfly from "../world/Butterfly";
+import WorldCollectibles from "../world/collectibles/WorldCollectibles";
+import WorldNavigationController from "../world/navigation/WorldNavigationController";
 import Island from "../world/Island";
 import Moon from "../world/Moon";
 import {
@@ -148,27 +150,18 @@ export default function World({ onReady }: { onReady: () => void }) {
         <RecordPlayer />
         <WorldDetails theme={resolvedTheme} />
 
-        {(interactions?.butterflySecret?.enabled ?? true) && (
-          <FlyingPage color={butterflyColor} requiredClicks={requiredClicks} />
-        )}
+        <FlyingPage color={butterflyColor} requiredClicks={requiredClicks} />
+
+        {(interactions?.butterflySecret?.enabled ?? true) ? (
+          <Butterfly color={butterflyColor} />
+        ) : null}
+
+        <WorldCollectibles />
       </group>
 
       <CameraRig />
 
-      {mode === "WORLD" &&
-        !transitioning &&
-        (cameraSettings?.orbitEnabled ?? true) && (
-          <OrbitControls
-            target={[0, 0.85, 0]}
-            enablePan={false}
-            enableZoom={false}
-            minPolarAngle={0.65}
-            maxPolarAngle={1.15}
-            minAzimuthAngle={0.25}
-            maxAzimuthAngle={0.85}
-            rotateSpeed={cameraSettings?.orbitSpeed ?? 0.3}
-          />
-        )}
+      {(cameraSettings?.orbitEnabled ?? true) && <WorldNavigationController />}
     </>
   );
 }

@@ -6,11 +6,14 @@ import { ContactSettings } from '../models/ContactSettings.js';
 import { JourneyMilestone } from '../models/JourneyMilestone.js';
 import { Mood } from '../models/Mood.js';
 import { Quote } from '../models/Quote.js';
+import { Secret } from '../models/Secret.js';
 import { SiteSettings } from '../models/SiteSettings.js';
 import { Song } from '../models/Song.js';
 import { WorldSettings } from '../models/WorldSettings.js';
 import { defaultContent } from '../seeds/defaultContent.js';
+import { defaultSecrets } from '../seeds/defaultSecrets.js';
 import { defaultWorldSettings } from '../seeds/defaultWorldSettings.js';
+import { seedCollectibles } from './seedCollectibles.js';
 
 async function seedContent() {
   try {
@@ -50,6 +53,7 @@ async function seedContent() {
     await seedCollection(Quote, defaultContent.quotes, 'Quotes');
     await seedCollection(Artwork, defaultContent.artworks, 'Artworks');
     await seedCollection(JourneyMilestone, defaultContent.journey, 'JourneyMilestones');
+    await seedCollection(Secret, defaultSecrets, 'Secrets');
 
     // Seed songs, then use their IDs for moods
     const songs = await seedCollection(Song, defaultContent.songs, 'Songs');
@@ -66,6 +70,9 @@ async function seedContent() {
     } else {
       console.log('ℹ️ Moods collection not empty or no songs. Skipping.');
     }
+
+    // Seed Collectibles (Phase 9)
+    await seedCollectibles();
 
     console.log('✨ Seeding complete!');
   } catch (error) {

@@ -17,8 +17,19 @@ import {
 } from "react";
 import { SectionContent } from "../ui/Content";
 import SecretModal from "../ui/SecretModal";
+import SecretRevealLayer from "../ui/secret/SecretRevealLayer";
+import CollectibleHUD from "../ui/collectible/CollectibleHUD";
+import CollectibleRevealLayer from "../ui/collectible/CollectibleRevealLayer";
+import CollectionBookModal from "../ui/collectible/CollectionBookModal";
 import SectionOverlay from "../ui/SectionOverlay";
 import GlobalAudioPlayer from "./GlobalAudioPlayer";
+import WorldNavigationHint from "../world/navigation/WorldNavigationHint";
+import { useCameraNavigationStore } from "../world/navigation/cameraNavigationStore";
+import { useSecretEngine } from "@/hooks/useSecretEngine";
+import { safeEmitSecretEvent } from "@/services/secretEventBus";
+import { QuoteTVProvider } from "../world/quote-tv/QuoteTVContext";
+import QuoteTVAccessibility from "../world/quote-tv/QuoteTVAccessibility";
+import { IN_WORLD_QUOTE_TV } from "../world/quote-tv/quoteTVConfig";
 
 // Suppress internal library deprecation noise (e.g. THREE.Clock in Three.js r183 from @react-three/fiber)
 if (typeof window !== "undefined") {
@@ -68,8 +79,23 @@ export default function Experience() {
     open,
     skip,
   } = useExperienceStore();
+
+  useSecretEngine();
+
+  // Emit VISIT_SECTION only after section genuinely opens and transition completes
+  useEffect(() => {
+    if (!transitioning && mode !== "WORLD" && mode !== "INTRO") {
+      safeEmitSecretEvent({
+        type: "VISIT_SECTION",
+        targetType: "SECTION",
+        metadata: { section: mode },
+      });
+    }
+  }, [mode, transitioning]);
+
   const [flat, setFlat] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
+  const inWorldQuotes = IN_WORLD_QUOTE_TV && !flat && worldSettings.objects?.desk?.visible !== false;
 
   useEffect(() => {
     if (flat || sceneReady) return;
@@ -191,6 +217,7 @@ export default function Experience() {
   }, [bgColor, mounted]);
 
   return (
+    <QuoteTVProvider enabled={inWorldQuotes}>
     <main
       data-reduced-motion={reducedMotion}
       data-theme={isDark ? "dark" : "light"}
@@ -198,6 +225,7 @@ export default function Experience() {
       style={
         {
           backgroundColor: renderBg,
+          minHeight: inWorldQuotes && mode === "QUOTES" ? "100dvh" : undefined,
           "--world-bg": renderBg,
         } as React.CSSProperties
       }
@@ -227,14 +255,26 @@ export default function Experience() {
           A SMALL WORLD.
           <br />A LITTLE BIT OF ME.
         </div>
-        <button
-          className="index-button"
-          onClick={() => setMenu(!menu)}
-          aria-expanded={menu}
-          aria-controls="world-nav"
+        <div
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            zIndex: menu ? 85 : 40,
+          }}
         >
-          {menu ? "Close" : exploreLabel} <span>{menu ? "×" : "☷"}</span>
-        </button>
+          <CollectibleHUD />
+          <button
+            className="index-button"
+            style={{ marginLeft: 0 }}
+            onClick={() => setMenu(!menu)}
+            aria-expanded={menu}
+            aria-controls="world-nav"
+          >
+            {menu ? "Close" : exploreLabel} <span>{menu ? "×" : "☷"}</span>
+          </button>
+        </div>
       </header>
       {mode === "WORLD" && (
         <div className="world-heading">
@@ -367,9 +407,14 @@ export default function Experience() {
           </nav>
         </>
       )}
-      <SectionOverlay />
+      <SectionOverlay inWorldQuotes={inWorldQuotes} />
+      <QuoteTVAccessibility menuOpen={menu} />
       <SecretModal />
+      <SecretRevealLayer />
+      <CollectibleRevealLayer />
+      <CollectionBookModal />
       <GlobalAudioPlayer />
+      <WorldNavigationHint />
       <footer>
         <div className="world-instruction">
           <span className="compass">✥</span>
@@ -390,6 +435,18 @@ export default function Experience() {
           </div>
         </div>
         <div className="world-controls">
+          {world && (
+            <button
+              className="control-button reset-view-button"
+              onClick={() =>
+                useCameraNavigationStore.getState().triggerResetView()
+              }
+              title="Reset island view"
+              aria-label="Reset island view"
+            >
+              ⟲ Reset
+            </button>
+          )}
           <button
             className="control-button sound-button"
             aria-label={isSoundActive ? "Mute sound" : "Enable sound"}
@@ -464,5 +521,6 @@ export default function Experience() {
         </div>
       )}
     </main>
+    </QuoteTVProvider>
   );
 }

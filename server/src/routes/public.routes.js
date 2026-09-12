@@ -5,10 +5,12 @@ import { contactLimiter } from '../middleware/rateLimit.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { Artist } from '../models/Artist.js';
 import { Artwork } from '../models/Artwork.js';
+import { Collectible } from '../models/Collectible.js';
 import { ContactSettings } from '../models/ContactSettings.js';
 import { JourneyMilestone } from '../models/JourneyMilestone.js';
 import { Mood } from '../models/Mood.js';
 import { Quote } from '../models/Quote.js';
+import { Secret } from '../models/Secret.js';
 import { SiteSettings } from '../models/SiteSettings.js';
 import { Song } from '../models/Song.js';
 import { worldSettingsService } from '../services/worldSettings.service.js';
@@ -29,7 +31,9 @@ router.get('/content', asyncHandler(async (req, res) => {
     songs,
     moods,
     contact,
-    world
+    world,
+    secrets,
+    collectibles,
   ] = await Promise.all([
     SiteSettings.findOne({ isPublished: true }).lean(),
     Artist.findOne({ isPublished: true }).lean(),
@@ -39,7 +43,9 @@ router.get('/content', asyncHandler(async (req, res) => {
     Song.find({ isPublished: true }).sort({ order: 1 }).lean(),
     Mood.find({ isPublished: true }).sort({ order: 1 }).lean(),
     ContactSettings.findOne({ isPublished: true }).lean(),
-    worldSettingsService.getPublicWorldSettings()
+    worldSettingsService.getPublicWorldSettings(),
+    Secret.find({ isPublished: true, enabled: true }).sort({ order: 1 }).lean(),
+    Collectible.find({ isPublished: true, enabled: true }).sort({ order: 1 }).lean(),
   ]);
 
   // Clean data for public consumption (preserve string ID, remove __v)
@@ -111,6 +117,45 @@ router.get('/content', asyncHandler(async (req, res) => {
     worldEffect: m.worldEffect || undefined,
   }));
 
+  const safeSecrets = (secrets || []).map((sec) => {
+    const { __v, createdAt, updatedAt, adminNote, ...rest } = sec;
+    return {
+      ...rest,
+      _id: sec._id ? String(sec._id) : undefined,
+      id: sec._id ? String(sec._id) : undefined,
+      conditions: {
+        ...sec.conditions,
+        moods: Array.isArray(sec.conditions?.moods)
+          ? sec.conditions.moods.map((id) => String(id))
+          : [],
+        requiresSecretIds: Array.isArray(sec.conditions?.requiresSecretIds)
+          ? sec.conditions.requiresSecretIds.map((id) => String(id))
+          : [],
+      },
+      reveal: {
+        ...sec.reveal,
+        image: mapMedia(sec.reveal?.image),
+        quoteId: sec.reveal?.quoteId ? String(sec.reveal.quoteId) : undefined,
+        collectibleId: sec.reveal?.collectibleId ? String(sec.reveal.collectibleId) : undefined,
+      },
+    };
+  });
+
+  const safeCollectibles = (collectibles || []).map((col) => {
+    const { __v, createdAt, updatedAt, adminNote, ...rest } = col;
+    return {
+      ...rest,
+      _id: col._id ? String(col._id) : undefined,
+      id: col._id ? String(col._id) : undefined,
+      placement: {
+        ...col.placement,
+        requiredMood: col.placement?.requiredMood
+          ? String(col.placement.requiredMood)
+          : null,
+      },
+    };
+  });
+
   return success(res, {
     data: {
       site: cleanDoc(site) || {},
@@ -123,7 +168,9 @@ router.get('/content', asyncHandler(async (req, res) => {
         moods: safeMoods
       },
       contact: cleanDoc(contact) || {},
-      world: world || {}
+      world: world || {},
+      secrets: safeSecrets,
+      collectibles: safeCollectibles,
     }
   });
 }));

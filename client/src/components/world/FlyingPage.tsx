@@ -1,6 +1,8 @@
 "use client";
 
+import { safeEmitSecretEvent } from "@/services/secretEventBus";
 import { useExperienceStore } from "@/store/useExperienceStore";
+import { useSecretStore } from "@/store/useSecretStore";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { DoubleSide, Group, Mesh } from "three";
@@ -91,12 +93,26 @@ export default function FlyingPage({
     if (mode !== "WORLD" || transitioning) return;
     e.stopPropagation();
 
-    const nextClicks = clicks + 1;
-    if (nextClicks >= requiredClicks) {
-      setClicks(0);
-      openSecret();
-    } else {
-      setClicks(nextClicks);
+    // Fire semantic event to Secret Engine (engine owns multi-click counting and timing)
+    safeEmitSecretEvent({
+      type: "CLICK",
+      targetType: "FLYING_PAGE",
+      targetId: "flying-paper",
+    });
+
+    // Fallback: If secrets feature is explicitly disabled or no definitions exist, preserve legacy modal behavior
+    const secretsDisabled =
+      process.env.NEXT_PUBLIC_SECRETS_ENABLED === "false";
+    const hasSecretDefs = useSecretStore.getState().definitions.length > 0;
+
+    if (secretsDisabled || !hasSecretDefs) {
+      const nextClicks = clicks + 1;
+      if (nextClicks >= requiredClicks) {
+        setClicks(0);
+        openSecret();
+      } else {
+        setClicks(nextClicks);
+      }
     }
   };
 

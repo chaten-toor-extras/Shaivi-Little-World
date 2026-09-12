@@ -1,14 +1,22 @@
+import { RESOLVED_WORLD_OBJECTS } from "@/data/worldLayout";
 import { labels, type Section } from "@/data/portfolio";
 import { useWorldSettings } from "@/providers/ContentProvider";
 import { useExperienceStore } from "@/store/useExperienceStore";
 import { useMusicStore } from "@/store/useMusicStore";
 import type { ResolvedWorldTheme } from "@/types/world";
+import { useIntentionalClick } from "@/utils/intentionalClick";
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { Group } from "three";
 import HouseDetails from "./HouseDetails";
 import { Ball, Box, Cylinder } from "./Shapes";
+import QuoteScreen3D from "./quote-tv/QuoteScreen3D";
+import TVControls3D from "./quote-tv/TVControls3D";
+import { useQuoteTV } from "./quote-tv/QuoteTVContext";
+import { IN_WORLD_QUOTE_TV } from "./quote-tv/quoteTVConfig";
+import { quotePointerGuard } from "./quote-tv/quotePointerGuard";
+import TVCabinet3D from "./quote-tv/TVCabinet3D";
 
 function ObjectLink({
   section,
@@ -60,9 +68,14 @@ function ObjectLink({
   const displayIcon = secConfig?.icon || defaultIcon;
   const displayLabel = secConfig?.label || labels[section];
 
+  const { handlePointerDown, handlePointerMove, isIntentionalClick } =
+    useIntentionalClick();
+
   return (
     <group
       position={position}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
       onPointerOver={(e) => {
         if (active) {
           e.stopPropagation();
@@ -75,7 +88,7 @@ function ObjectLink({
         document.body.style.cursor = "auto";
       }}
       onClick={(e) => {
-        if (active) {
+        if (active && isIntentionalClick(e) && (section !== "QUOTES" || !IN_WORLD_QUOTE_TV || quotePointerGuard.allows(performance.now()))) {
           e.stopPropagation();
           document.body.style.cursor = "auto";
           setHover(false);
@@ -83,7 +96,7 @@ function ObjectLink({
         }
       }}
     >
-      <group scale={hoverScale}>{children}</group>
+      <group scale={active ? hoverScale : 1}>{children}</group>
       {active && (
         <Html center position={[0, labelHeight, 0]} zIndexRange={[20, 10]}>
           <button
@@ -109,6 +122,8 @@ export function House({ theme }: { theme?: ResolvedWorldTheme } = {}) {
   const mode = useExperienceStore((s) => s.mode);
   const obj = worldSettings.objects?.house;
 
+  const currentPeriod = useExperienceStore((s) => s.currentTimeOfDay);
+
   useFrame((_, dt) => {
     if (door.current)
       door.current.rotation.y +=
@@ -121,7 +136,6 @@ export function House({ theme }: { theme?: ResolvedWorldTheme } = {}) {
   const wallColor = obj?.wallColor || "#e9cfaa";
   const roofColor = obj?.roofColor || "#b46d57";
   const doorColor = obj?.doorColor || "#75877a";
-  const currentPeriod = useExperienceStore((s) => s.currentTimeOfDay);
   const profileKey = (currentPeriod?.toLowerCase() || "day") as
     | "morning"
     | "day"
@@ -136,7 +150,11 @@ export function House({ theme }: { theme?: ResolvedWorldTheme } = {}) {
         : 1.0;
 
   return (
-    <ObjectLink section="ABOUT" position={[0, 0.15, -1.1]} labelHeight={3.2}>
+    <ObjectLink
+      section="ABOUT"
+      position={RESOLVED_WORLD_OBJECTS.HOUSE}
+      labelHeight={3.2}
+    >
       <HouseDetails
         windowGlowEnabled={obj?.windowGlowEnabled ?? true}
         windowGlowColor={obj?.windowGlowColor || "#f7ddb0"}
@@ -186,6 +204,7 @@ export function House({ theme }: { theme?: ResolvedWorldTheme } = {}) {
 }
 
 export function Desk() {
+  const quoteTV = useQuoteTV();
   const mode = useExperienceStore((s) => s.mode);
   const worldSettings = useWorldSettings();
   const obj = worldSettings.objects?.desk;
@@ -198,7 +217,11 @@ export function Desk() {
   const screenActiveColor = obj?.screenActiveColor || "#efe9df";
 
   return (
-    <ObjectLink section="QUOTES" position={[1.4, 0.12, 2.1]} labelHeight={2.1}>
+    <ObjectLink
+      section="QUOTES"
+      position={RESOLVED_WORLD_OBJECTS.DESK}
+      labelHeight={2.1}
+    >
       <Box position={[0, 0.78, 0]} scale={[1.8, 0.13, 0.8]} color={woodColor} />
       {[-0.75, 0.75].flatMap((x) =>
         [-0.28, 0.28].map((z) => (
@@ -210,7 +233,7 @@ export function Desk() {
           />
         )),
       )}
-      <Box
+      {quoteTV?.enabled ? <TVCabinet3D /> : <><Box
         position={[0, 1.4, 0]}
         scale={[1.25, 0.83, 0.1]}
         color={frameColor}
@@ -219,8 +242,8 @@ export function Desk() {
         position={[0.73, 1.4, 0]}
         scale={[0.24, 0.83, 0.18]}
         color="#ac8867"
-      />
-      {[1.25, 1.55].map((y) => (
+      /></>}
+      {quoteTV?.enabled ? <TVControls3D /> : [1.25, 1.55].map((y) => (
         <Cylinder
           key={y}
           position={[0.74, y, 0.12]}
@@ -240,6 +263,7 @@ export function Desk() {
         scale={[1.13, 0.7, 0.025]}
         color={mode === "QUOTES" ? screenActiveColor : screenInactiveColor}
       />
+      {quoteTV?.enabled && <QuoteScreen3D />}
       <Box position={[0, 0.97, 0]} scale={[0.1, 0.3, 0.1]} color="#5b615b" />
       <Box
         position={[0, 0.85, 0.02]}
@@ -283,7 +307,7 @@ export function ArtWall() {
   return (
     <ObjectLink
       section="GALLERY"
-      position={[-2.8, 0.12, -0.3]}
+      position={RESOLVED_WORLD_OBJECTS.ART_WALL}
       labelHeight={2.4}
     >
       <Box position={[0, 1.2, 0]} scale={[1.1, 1.45, 0.1]} color={frameColor} />
@@ -333,7 +357,7 @@ export function Telescope() {
   return (
     <ObjectLink
       section="JOURNEY"
-      position={[1.65, 0.35, -2.5]}
+      position={RESOLVED_WORLD_OBJECTS.TELESCOPE}
       labelHeight={2.5}
     >
       <Cylinder
@@ -389,7 +413,7 @@ export function Mailbox() {
   return (
     <ObjectLink
       section="CONTACT"
-      position={[-0.5, 0.12, 3.1]}
+      position={RESOLVED_WORLD_OBJECTS.MAILBOX}
       labelHeight={1.6}
     >
       <Box position={[0, 0.45, 0]} scale={[0.1, 0.9, 0.1]} color={postColor} />
@@ -443,7 +467,11 @@ export function RecordPlayer() {
   const handColor = obj?.handColor || "#596555";
 
   return (
-    <ObjectLink section="MUSIC" position={[3, 0.12, 0.3]} labelHeight={1.7}>
+    <ObjectLink
+      section="MUSIC"
+      position={RESOLVED_WORLD_OBJECTS.RECORD_PLAYER}
+      labelHeight={1.7}
+    >
       <Box position={[0, 0.46, 0]} scale={[1, 0.09, 0.7]} color="#9f8065" />
       {[-0.4, 0.4].map((x) => (
         <Box

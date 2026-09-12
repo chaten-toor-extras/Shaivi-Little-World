@@ -8,6 +8,7 @@ import {
   ArrowUpOutlined,
   DeleteOutlined,
   EditOutlined,
+  MoreOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +17,7 @@ import {
   App,
   Button,
   Card,
+  Dropdown,
   Form,
   Input,
   InputNumber,
@@ -24,11 +26,12 @@ import {
   Space,
   Switch,
   Table,
+  Tooltip,
 } from "antd";
 import { useState } from "react";
 
 export default function AdminGalleryPage() {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingArtwork, setEditingArtwork] = useState<Artwork | null>(null);
@@ -217,25 +220,45 @@ export default function AdminGalleryPage() {
     {
       title: "Actions",
       key: "actions",
-      width: 110,
+      width: 80,
+      align: "center" as const,
       render: (_: any, record: Artwork) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          />
-          <Popconfirm
-            title="Delete artwork?"
-            description="This will remove the artwork and its image."
-            onConfirm={() => deleteMutation.mutate(record._id)}
-            okText="Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "edit",
+                label: "Edit Artwork",
+                icon: <EditOutlined />,
+                onClick: () => handleEdit(record),
+              },
+              {
+                type: "divider",
+              },
+              {
+                key: "delete",
+                label: "Delete Artwork",
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () => {
+                  modal.confirm({
+                    title: "Delete artwork?",
+                    content: "This will remove the artwork and its image.",
+                    okText: "Delete",
+                    okType: "danger",
+                    onOk: () => deleteMutation.mutate(record._id),
+                  });
+                },
+              },
+            ],
+          }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <Tooltip title="Actions">
+            <Button size="small" type="text" icon={<MoreOutlined style={{ fontSize: "16px" }} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];

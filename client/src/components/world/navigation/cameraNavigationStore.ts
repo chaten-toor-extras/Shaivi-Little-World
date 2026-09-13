@@ -10,10 +10,12 @@ interface CameraNavigationState {
     target: THREE.Vector3;
   } | null;
   resetCounter: number;
+  isCinematicActive: boolean;
   setHasUserNavigated: (v: boolean) => void;
   saveExplorationPose: (position: THREE.Vector3, target: THREE.Vector3) => void;
   clearExplorationPose: () => void;
   triggerResetView: () => void;
+  setIsCinematicActive: (v: boolean) => void;
 }
 
 /**
@@ -24,6 +26,7 @@ export const useCameraNavigationStore = create<CameraNavigationState>((set) => (
   hasUserNavigated: false,
   savedExplorationPose: null,
   resetCounter: 0,
+  isCinematicActive: false,
   setHasUserNavigated: (v) => set({ hasUserNavigated: v }),
   saveExplorationPose: (position, target) =>
     set({
@@ -34,6 +37,7 @@ export const useCameraNavigationStore = create<CameraNavigationState>((set) => (
     }),
   clearExplorationPose: () => set({ savedExplorationPose: null }),
   triggerResetView: () => set((s) => ({ resetCounter: s.resetCounter + 1 })),
+  setIsCinematicActive: (isCinematicActive) => set({ isCinematicActive }),
 }));
 
 /**
@@ -43,15 +47,18 @@ export const useCameraNavigationStore = create<CameraNavigationState>((set) => (
  * - No programmatic camera transition in flight
  * - No modal secret dialog open
  * - No collection book open
+ * - No completion cinematic active
  */
 export function canNavigateWorld(): boolean {
   const exp = useExperienceStore.getState();
   const col = useCollectibleStore.getState();
+  const nav = useCameraNavigationStore.getState();
 
   return (
     exp.mode === "WORLD" &&
     !exp.transitioning &&
     !exp.secretOpen &&
-    !col.bookOpen
+    !col.bookOpen &&
+    !nav.isCinematicActive
   );
 }

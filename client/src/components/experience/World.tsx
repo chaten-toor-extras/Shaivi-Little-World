@@ -14,6 +14,8 @@ import Clouds from "../world/Clouds";
 import FlyingPage from "../world/FlyingPage";
 import Butterfly from "../world/Butterfly";
 import WorldCollectibles from "../world/collectibles/WorldCollectibles";
+import WorldEvolution from "../world/evolution/WorldEvolution";
+import CompletionCinematic from "../world/completion/CompletionCinematic";
 import WorldNavigationController from "../world/navigation/WorldNavigationController";
 import Island from "../world/Island";
 import Moon from "../world/Moon";
@@ -157,6 +159,8 @@ export default function World({ onReady }: { onReady: () => void }) {
         ) : null}
 
         <WorldCollectibles />
+        <WorldEvolution theme={resolvedTheme} />
+        <CompletionCinematic theme={resolvedTheme} />
       </group>
 
       <CameraRig />

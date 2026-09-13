@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuotes } from "@/providers/ContentProvider";
+import { worldProgressStorage } from "@/services/worldProgressStorage";
 import { useMemo } from "react";
 import { create } from "zustand";
 import type { Quote } from "@/types";
@@ -13,11 +14,20 @@ export const useQuotePlayerMemory = create<{
   turnPage: (total: number) => void;
 }>((set) => ({
   index: 0, on: true, page: 0,
-  tune: (delta, total) => set((s) => total > 1
-    ? { index: ((s.index + delta) % total + total) % total, page: 0 } : {}),
-  toggle: () => set((s) => ({ on: !s.on })),
+  tune: (delta, total) => {
+    worldProgressStorage.recordQuoteInteracted();
+    set((s) => total > 1
+      ? { index: ((s.index + delta) % total + total) % total, page: 0 } : {});
+  },
+  toggle: () => {
+    worldProgressStorage.recordQuoteInteracted();
+    set((s) => ({ on: !s.on }));
+  },
   setOn: (on) => set({ on }),
-  turnPage: (total) => set((s) => ({ page: (s.page + 1) % Math.max(1, total) })),
+  turnPage: (total) => {
+    worldProgressStorage.recordQuoteInteracted();
+    set((s) => ({ page: (s.page + 1) % Math.max(1, total) }));
+  },
 }));
 
 export function publishedQuotes(source: Quote[]) {

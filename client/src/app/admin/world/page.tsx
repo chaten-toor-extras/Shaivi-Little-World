@@ -2405,6 +2405,146 @@ export default function AdminWorldPage() {
         </Row>
       ),
     },
+    {
+      key: "completion",
+      label: "Completion Cinematic",
+      forceRender: true,
+      children: (
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Card
+              title="Phase 11 — Completion Moment"
+              variant="borderless"
+              style={{ background: "#fcfaf7", borderRadius: 8 }}
+            >
+              <Paragraph type="secondary" style={{ fontSize: "0.85rem" }}>
+                When visitors meaningfully explore the world, the island quietly
+                acknowledges it with a gentle cinematic and thoughtful message.
+              </Paragraph>
+
+              <Form.Item
+                label="Enable Completion Cinematic"
+                name={["completion", "enabled"]}
+                valuePropName="checked"
+              >
+                <Switch />
+              </Form.Item>
+
+              <Form.Item
+                label="Auto-Play on First Qualification"
+                name={["completion", "autoPlayEnabled"]}
+                valuePropName="checked"
+                help="When enabled, automatically triggers once when visitor qualifies at a calm moment."
+              >
+                <Switch />
+              </Form.Item>
+
+              <Form.Item
+                label="Eyebrow Text (max 80 chars)"
+                name={["completion", "eyebrow"]}
+              >
+                <Input
+                  maxLength={80}
+                  placeholder="you found your way through this little world ✦"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Main Heading / Quote (max 120 chars)"
+                name={["completion", "title"]}
+              >
+                <Input
+                  maxLength={120}
+                  placeholder="some things were meant to be noticed slowly."
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Message Body (max 400 chars)"
+                name={["completion", "message"]}
+              >
+                <Input.TextArea
+                  rows={3}
+                  maxLength={400}
+                  placeholder="A quiet thank you for wandering through Shaivi’s Little World."
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Continue Button Label"
+                name={["completion", "buttonLabel"]}
+              >
+                <Input maxLength={40} placeholder="Continue exploring" />
+              </Form.Item>
+
+              <Form.Item
+                label="Replay Button Label (in Keepsakes)"
+                name={["completion", "replayLabel"]}
+              >
+                <Input maxLength={40} placeholder="Replay final moment ✦" />
+              </Form.Item>
+
+              <div style={{ marginTop: 16 }}>
+                <Button
+                  onClick={() => {
+                    const vals = form.getFieldsValue(true).completion;
+                    modal.info({
+                      title: "Completion Message Preview",
+                      content: (
+                        <div
+                          style={{
+                            padding: "12px 0",
+                            textAlign: "center",
+                          }}
+                        >
+                          <p
+                            style={{
+                              textTransform: "uppercase",
+                              fontSize: "0.75rem",
+                              letterSpacing: "0.1em",
+                              color: "#8a6d79",
+                              margin: 0,
+                            }}
+                          >
+                            {vals?.eyebrow ||
+                              "you found your way through this little world ✦"}
+                          </p>
+                          <h3
+                            style={{
+                              margin: "8px 0",
+                              fontStyle: "italic",
+                            }}
+                          >
+                            {vals?.title ||
+                              "some things were meant to be noticed slowly."}
+                          </h3>
+                          <p style={{ color: "#666", fontSize: "0.9rem" }}>
+                            {vals?.message ||
+                              "A quiet thank you for wandering through Shaivi’s Little World."}
+                          </p>
+                          <Button
+                            type="primary"
+                            style={{
+                              marginTop: 8,
+                              background: "#3c2f3d",
+                            }}
+                          >
+                            {vals?.buttonLabel || "Continue exploring"}
+                          </Button>
+                        </div>
+                      ),
+                      okText: "Close Preview",
+                    });
+                  }}
+                >
+                  Preview Message Card
+                </Button>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      ),
+    },
   ];
 
   return (

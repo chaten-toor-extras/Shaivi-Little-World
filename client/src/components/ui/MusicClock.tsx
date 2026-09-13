@@ -2,6 +2,7 @@
 
 import { useMusic } from "@/providers/ContentProvider";
 import { safeEmitSecretEvent } from "@/services/secretEventBus";
+import { worldProgressStorage } from "@/services/worldProgressStorage";
 import { useMusicStore } from "@/store/useMusicStore";
 import { useEffect, useState, type CSSProperties } from "react";
 import Photo from "./Photo";
@@ -101,6 +102,9 @@ export default function MusicClock() {
       }
       const newPlaylist = getMoodPlaylist(m);
       setPlaylistInStore(newPlaylist, 0);
+
+      // Record genuine user music interaction
+      worldProgressStorage.recordMusicPlayed();
 
       // Fire user-initiated mood selection event
       safeEmitSecretEvent({
@@ -231,7 +235,10 @@ export default function MusicClock() {
             className="play-circle"
             aria-label={isPlaying ? "Pause" : "Play"}
             aria-pressed={isPlaying}
-            onClick={() => void togglePlay()}
+            onClick={() => {
+              worldProgressStorage.recordMusicPlayed();
+              void togglePlay();
+            }}
           >
             {isPlaying ? "Ⅱ" : "▶"}
           </button>

@@ -2,6 +2,8 @@
 
 import CollectiblePreviewCanvas from "@/components/world/collectibles/CollectiblePreviewCanvas";
 import { COLLECTIBLE_MODELS } from "@/components/world/collectibles/modelRegistry";
+import { useCompletionCinematicStore } from "@/components/world/completion/useCompletionCinematicStore";
+import { useWorldSettings } from "@/providers/ContentProvider";
 import { useCollectibleStore } from "@/store/useCollectibleStore";
 import type { PublicCollectible } from "@/types";
 import React, { useEffect, useMemo, useRef } from "react";
@@ -27,6 +29,16 @@ export default function CollectionBookModal() {
   const selectBookItem = useCollectibleStore((s) => s.selectBookItem);
   const getActiveTotal = useCollectibleStore((s) => s.getActiveTotal);
   const getCollectedCount = useCollectibleStore((s) => s.getCollectedCount);
+  const worldSettings = useWorldSettings();
+  const hasPlayed = useCompletionCinematicStore((s) => s.hasPlayed);
+
+  const handleReplay = () => {
+    closeBook();
+    // Allow book modal to cleanly exit and restore focus before triggering cinematic
+    setTimeout(() => {
+      useCompletionCinematicStore.getState().startCinematic(true);
+    }, 200);
+  };
 
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -203,6 +215,35 @@ export default function CollectionBookModal() {
                     </div>
                   )}
                 </>
+              )}
+
+              {hasPlayed && (worldSettings.completion?.enabled ?? true) && (
+                <div
+                  style={{
+                    marginTop: "1.25rem",
+                    paddingTop: "0.85rem",
+                    borderTop: "1px dashed rgba(0, 0, 0, 0.1)",
+                    textAlign: "center",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={handleReplay}
+                    style={{
+                      background: "rgba(255, 255, 255, 0.6)",
+                      border: "1px solid rgba(60, 47, 61, 0.2)",
+                      borderRadius: "16px",
+                      padding: "0.35rem 0.85rem",
+                      fontSize: "0.75rem",
+                      color: "#554854",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                    aria-label="Replay final world moment"
+                  >
+                    {worldSettings.completion?.replayLabel || "Replay final moment ✦"}
+                  </button>
+                </div>
               )}
             </div>
           )}

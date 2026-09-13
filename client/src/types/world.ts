@@ -362,6 +362,18 @@ export interface ResolvedWorldTheme {
   transitionDuration: number;
 }
 
+export interface WorldCompletionSettings {
+  enabled: boolean;
+  autoPlayEnabled?: boolean;
+  autoPlayOnce?: boolean;
+  eyebrow?: string;
+  title?: string;
+  message?: string;
+  buttonLabel?: string;
+  replayLabel?: string;
+  optionalChime?: boolean;
+}
+
 export interface WorldSettings {
   schemaVersion: number;
   identity: WorldIdentitySettings;
@@ -378,4 +390,5 @@ export interface WorldSettings {
   sections: WorldSectionsSettings;
   dayNight: DayNightSettings;
   musicMood?: WorldMusicMoodSettings;
+  completion?: WorldCompletionSettings;
 }

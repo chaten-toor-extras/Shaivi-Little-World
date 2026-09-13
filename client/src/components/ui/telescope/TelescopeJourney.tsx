@@ -1,6 +1,7 @@
 "use client";
 
 import { safeEmitSecretEvent } from "@/services/secretEventBus";
+import { worldProgressStorage } from "@/services/worldProgressStorage";
 import { useSecretStore } from "@/store/useSecretStore";
 import type { JourneyMilestone } from "@/types";
 import dynamic from "next/dynamic";
@@ -73,6 +74,7 @@ export default function TelescopeJourney({
   const handleSelectStar = useCallback((index: number) => {
     setActiveIndex(index);
     setCardOpen(true);
+    worldProgressStorage.recordJourneyExplored();
     safeEmitSecretEvent({
       type: "CLICK",
       targetType: "TELESCOPE",

@@ -3,6 +3,7 @@
 import { useContactSettings } from "@/providers/ContentProvider";
 import { contentService } from "@/services/content.service";
 import { safeEmitSecretEvent } from "@/services/secretEventBus";
+import { worldProgressStorage } from "@/services/worldProgressStorage";
 import { useSecretStore } from "@/store/useSecretStore";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
@@ -56,6 +57,7 @@ export default function LetterContact() {
 
       // API confirmed persistence -> update secret session state & emit event
       useSecretStore.getState().setLetterSentSession(true);
+      worldProgressStorage.recordLetterSent();
       safeEmitSecretEvent({
         type: "LETTER_SENT",
         targetType: "MAILBOX",

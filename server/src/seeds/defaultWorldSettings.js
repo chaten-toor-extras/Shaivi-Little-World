@@ -377,5 +377,16 @@ export const defaultWorldSettings = {
     enabled: true,
     transitionDuration: 2.5,
   },
+  completion: {
+    enabled: true,
+    autoPlayEnabled: true,
+    autoPlayOnce: true,
+    eyebrow: "you found your way through this little world ✦",
+    title: "some things were meant to be noticed slowly.",
+    message: "A quiet thank you for wandering through Shaivi’s Little World.",
+    buttonLabel: "Continue exploring",
+    replayLabel: "Replay final moment ✦",
+    optionalChime: false,
+  },
 };
 

@@ -414,6 +414,21 @@ const musicMoodSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const completionSchema = new mongoose.Schema(
+  {
+    enabled: { type: Boolean, default: defaultWorldSettings.completion.enabled },
+    autoPlayEnabled: { type: Boolean, default: defaultWorldSettings.completion.autoPlayEnabled },
+    autoPlayOnce: { type: Boolean, default: defaultWorldSettings.completion.autoPlayOnce },
+    eyebrow: { type: String, default: defaultWorldSettings.completion.eyebrow },
+    title: { type: String, default: defaultWorldSettings.completion.title },
+    message: { type: String, default: defaultWorldSettings.completion.message },
+    buttonLabel: { type: String, default: defaultWorldSettings.completion.buttonLabel },
+    replayLabel: { type: String, default: defaultWorldSettings.completion.replayLabel },
+    optionalChime: { type: Boolean, default: defaultWorldSettings.completion.optionalChime },
+  },
+  { _id: false }
+);
+
 const worldSettingsSchema = new mongoose.Schema(
   {
     schemaVersion: { type: Number, default: 2 },
@@ -433,6 +448,10 @@ const worldSettingsSchema = new mongoose.Schema(
     musicMood: {
       type: musicMoodSchema,
       default: () => defaultWorldSettings.musicMood || { enabled: true, transitionDuration: 2.5 },
+    },
+    completion: {
+      type: completionSchema,
+      default: () => defaultWorldSettings.completion,
     },
   },
   { timestamps: true }
